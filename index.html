@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>算数つまずき診断＆補助プリント ― つまずきの原因から作るスモールステッププリント</title>
+<meta name="description" content="児童の誤答パターンから算数のつまずきの根本原因を逆算し、その原因だけを練習できるA4補助プリントを生成する教員向けツール。記録は端末内のみ、児童の個人情報は扱いません。">
+<meta name="apple-mobile-web-app-title" content="つまずき診断プリント">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta property="og:title" content="算数つまずき診断＆補助プリント">
+<meta property="og:description" content="誤答パターンから根本原因を逆算し、原因だけを練習できるA4補助プリントを即生成する教員向けツール。">
+<meta property="og:image" content="og.png">
+<meta property="og:type" content="website">
+<style>
+:root{ --ink:#2c3430; --paper:#f4f6f1; --card:#fff; --line:#d5dfd2;
+  --main:#3e8e5a; --main-d:#2c6b42; --accent:#e8862e; --soft:#eef6ee; --red:#c8433c; }
+*{box-sizing:border-box;}
+html{font-size:16px;}
+body{margin:0; font-family:"BIZ UDPGothic","UD デジタル 教科書体 NK-R","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+  background:var(--paper); color:var(--ink); line-height:1.6;}
+header.top{background:linear-gradient(135deg,#3e8e5a,#74ac57); color:#fff; padding:16px 14px 12px; text-align:center;}
+header.top h1{margin:0; font-size:1.35rem;}
+header.top p{margin:3px 0 0; font-size:.82rem; opacity:.95;}
+main{max-width:1180px; margin:0 auto; padding:14px; display:grid; grid-template-columns:330px 1fr; gap:16px; align-items:start;}
+@media (max-width:900px){ main{grid-template-columns:1fr;} }
+.panel{background:var(--card); border:1.5px solid var(--line); border-radius:14px; padding:15px; margin-bottom:14px;}
+.panel h2{font-size:1.05rem; margin:0 0 10px; border-left:6px solid var(--main); padding-left:9px;}
+.small{font-size:.82rem; color:#5c6a60;}
+.btn{border:none; cursor:pointer; font:inherit; font-weight:700; background:var(--main); color:#fff;
+  border-radius:11px; padding:11px 18px; font-size:.98rem;}
+.btn.sub{background:#fff; color:var(--main-d); border:1.6px solid var(--main);}
+.btn.acc{background:var(--accent);}
+.btn:disabled{opacity:.45;}
+.btnrow{display:flex; flex-wrap:wrap; gap:9px; margin-top:10px;}
+.case-card{border:2px solid var(--line); border-radius:12px; padding:11px 13px; margin-bottom:10px; cursor:pointer; background:#fff; width:100%; text-align:left; font:inherit;}
+.case-card:hover{border-color:var(--main);}
+.case-card.on{border-color:var(--main); background:var(--soft);}
+.case-card .g{font-size:.78rem; color:#fff; background:var(--main); border-radius:999px; padding:1px 9px; margin-right:6px;}
+.case-card .t{font-weight:700;}
+.case-card .d{font-size:.85rem; color:#55645a; margin-top:3px;}
+.branch-q{font-weight:700; margin:12px 0 6px;}
+select,input[type="text"]{font:inherit; padding:9px; border:1.6px solid var(--line); border-radius:10px; background:#fff; width:100%;}
+label.f{display:block; font-size:.86rem; font-weight:700; margin:11px 0 4px;}
+.seg{display:flex; gap:6px; flex-wrap:wrap;}
+.seg button{flex:1; border:1.7px solid var(--line); background:#fff; border-radius:9px; padding:8px 4px; cursor:pointer; font:inherit; font-size:.88rem; min-width:56px;}
+.seg button.on{border-color:var(--main); background:var(--soft); font-weight:700;}
+.toggle{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 0;}
+.toggle button{border:1.7px solid var(--line); background:#fff; border-radius:999px; padding:5px 16px; cursor:pointer; font:inherit; font-size:.88rem;}
+.toggle button.on{border-color:var(--main); background:var(--soft); font-weight:700;}
+.cause-box{border:2px solid var(--accent); background:#fff8ef; border-radius:12px; padding:13px 15px; margin-bottom:12px;}
+.cause-box h3{margin:0 0 6px; font-size:1.05rem;}
+.cause-box ul{margin:6px 0 0; padding-left:1.2em;}
+/* ===== ワークシート ===== */
+.sheet-wrap{overflow:auto;}
+#sheet{width:210mm; min-height:296mm; margin:0 auto; padding:11mm 12mm 10mm; background:#fff; font-size:var(--pfs,16px);
+  box-shadow:0 2px 14px rgba(30,50,30,.14); transform-origin:top center; color:#222;
+  -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+#sheet.bg-cream{background:#fdf6e3;} #sheet.bg-blue{background:#eaf4fb;} #sheet.bg-green{background:#ecf7ec;}
+#sheet.fs-big{font-size:calc(var(--pfs,16px) * 1.14);} #sheet.fs-huge{font-size:calc(var(--pfs,16px) * 1.3);}
+#sheet.lh-wide{line-height:1.95;}
+.sheet-head{display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2.6px solid #333; padding-bottom:5px; gap:10px; flex-wrap:wrap;}
+.sheet-head .ttl{font-size:1.28em; font-weight:800;}
+.sheet-head .name{font-size:.94em; white-space:nowrap;}
+.goal{border:1.6px solid #6a9a76; background:rgba(255,255,255,.55); border-radius:9px; padding:6px 11px; margin:9px 0; font-size:.92em;}
+.sec-ttl{font-weight:800; margin:13px 0 7px; font-size:1.04em;}
+.sec-ttl .no{background:var(--main); color:#fff; border-radius:7px; padding:1px 9px; margin-right:7px; font-size:.9em;}
+.ex-box{border:2px solid #8ab98a; border-radius:11px; padding:10px 13px; background:rgba(255,255,255,.5);}
+.ex-flex{display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;}
+.ex-flex .ex-vis{flex:0 0 auto;}
+.ex-flex .think{flex:1; min-width:230px; margin-top:0;}
+.think{border-left:5px solid var(--accent); background:rgba(255,255,255,.55); padding:6px 11px; margin-top:8px; font-size:.93em;}
+.probs{display:grid; grid-template-columns:1fr 1fr; column-gap:26px; row-gap:12px;}
+.probs.cols3{grid-template-columns:1fr 1fr 1fr; column-gap:18px;}
+.prob{break-inside:avoid;}
+.prob .qn{font-weight:700; color:var(--main-d); margin-right:6px;}
+.hiss{font-family:inherit; border-collapse:collapse; margin:2px 0 2px 8px;}
+.hiss td{width:1.3em; height:1.18em; text-align:center; font-size:1.12em; padding:0; position:relative;}
+#sheet.grid .hiss td{border:1px solid #b9cfba;}
+#sheet:not(.grid) .hiss td{border:1px solid transparent;}
+.hiss .bar td{border-top:2.6px solid #333 !important; height:.5em;}
+.hiss .memo{position:absolute; top:-1.15em; left:50%; transform:translateX(-50%); width:1.15em; height:1.05em;
+  border:1.6px solid #c8873a; border-radius:4px; background:#fff; font-size:.52em; line-height:1.05em; color:#a5661a; display:none;}
+#sheet.grid .hiss .memo{display:block;}
+.hiss .memo:empty{border-style:dashed;}
+.blank{display:inline-block; min-width:2.1em; border:1.8px solid #777; border-radius:6px; height:1.5em; vertical-align:-.35em; margin:0 3px; background:rgba(255,255,255,.6);}
+.blank.sm{min-width:1.5em;}
+.ans{color:var(--red); font-weight:700;}
+.frac{display:inline-flex; flex-direction:column; text-align:center; vertical-align:-.55em; margin:0 3px; line-height:1.15; font-size:.94em;}
+.frac .n{border-bottom:2.2px solid currentColor; padding:0 .38em;}
+.frac .d{padding:0 .38em;}
+.scaffold{font-size:.88em; color:#476b52; margin-top:3px;}
+.deco{font-size:1.05em;}
+.foot-note{margin-top:14px; font-size:.8em; color:#667;}
+.answer-sheet .prob .qn{color:var(--red);}
+svg text{font-family:inherit;}
+/* 1枚に収めるための自動コンパクト表示（はみ出す場合だけJSが付ける） */
+#sheet.compact{padding:7mm 10mm 6mm;}
+#sheet.compact .hiss td{height:1.05em;}
+#sheet.compact .scaffold{font-size:.82em;}
+#sheet.compact .probs{row-gap:8px;}
+#sheet.compact .sec-ttl{margin:8px 0 4px;}
+#sheet.compact .hiss td{height:1.1em;}
+#sheet.compact .goal{margin:5px 0;}
+#sheet.compact .ex-box{padding:7px 10px;}
+#sheet.compact .think{margin-top:5px;}
+@media print{
+  body{background:#fff;}
+  header.top, .no-print{display:none !important;}
+  main{display:block; padding:0; max-width:none;}
+  .sheet-wrap{overflow:visible;}
+  #sheet{box-shadow:none; margin:0;}
+  @page{size:A4 portrait; margin:0;}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>🔍 算数つまずき診断＆補助プリント</h1>
+  <p>誤答パターンから「つまずきの根本原因」を逆算し、その原因だけを練習できるA4プリントを作る、先生のための道具です</p>
+</header>
+<main>
+  <div class="no-print">
+    <section class="panel" id="diagPanel">
+      <h2>1. つまずき診断</h2>
+      <p class="small">児童の様子にいちばん近いものを選んでください。根本原因（前提単元の抜け）と、指導のポイント・作れるプリントが出ます。</p>
+      <div id="caseList"></div>
+      <div id="branchBox"></div>
+      <div id="diagResult"></div>
+    </section>
+    <section class="panel">
+      <h2>2. プリントの見た目（配慮設定）</h2>
+      <p class="small">プレビューを見ながら、その子に合わせて調整できます。設定はこの端末の中にだけ保存されます。</p>
+      <div class="toggle"><span>筆算の補助線・マス目<br><span class="small">位取りの縦線と、繰り上がりメモの小さい枠</span></span><button id="tgGrid" class="on">ON</button></div>
+      <label class="f">文字の大きさ</label>
+      <div class="seg" id="segFs"><button data-v="" class="on">標準</button><button data-v="fs-big">大</button><button data-v="fs-huge">特大</button></div>
+      <label class="f">行間</label>
+      <div class="seg" id="segLh"><button data-v="" class="on">標準</button><button data-v="lh-wide">広め</button></div>
+      <label class="f">れんしゅう問題の数（例題は別に1問）</label>
+      <div class="seg" id="segCnt"><button data-v="5">5問</button><button data-v="10" class="on">10問</button><button data-v="15">15問</button></div>
+      <label class="f">プリントの背景色（画面と印刷の両方）</label>
+      <div class="seg" id="segBg"><button data-v="" class="on">白</button><button data-v="bg-cream">クリーム</button><button data-v="bg-blue">淡い水色</button><button data-v="bg-green">淡い緑</button></div>
+      <p class="small">※印刷で背景色を出すには、印刷画面で「背景グラフィック」（ブラウザによっては「背景色とイメージ」）をオンにしてください。</p>
+      <div class="toggle"><span>応援アイコン（🌸⭐）</span><button id="tgDeco">OFF</button></div>
+    </section>
+    <section class="panel">
+      <h2>3. 印刷</h2>
+      <div class="btnrow">
+        <button class="btn" id="printBtn">🖨 プリントを印刷</button>
+        <button class="btn sub" id="regenBtn">🎲 数字を変える</button>
+        <button class="btn acc" id="ansBtn">✅ 解答を見る</button>
+      </div>
+      <p class="small">A4縦・1枚に収まるよう自動調整します。解答プリントも同じボタンで切り替えて印刷できます。児童の名前などは保存しません（なまえ欄は印刷後に手書きしてください）。</p>
+    </section>
+  </div>
+  <div class="sheet-wrap">
+    <div id="sheet" class="grid"></div>
+  </div>
+</main>
+
+<script>
+"use strict";
+/* =====================================================================
+   診断モジュール（将来、LLM推論に差し替えやすいよう分離）
+   DIAGNOSIS_DATA: 誤答パターン（ケース）→ 分岐質問 → 根本原因（causeId）
+   diagnose(caseId, branchKey): 原因オブジェクトの配列を返す
+   ===================================================================== */
+const DIAGNOSIS_DATA = [
+  { id:'caseA', grade:'小4', title:'割り算の筆算',
+    symptom:'商が立てられない／位がズレる',
+    branch:{ q:'どちらの様子に近いですか？', options:[
+      { key:'a1', label:'商の見当（何を立てるか）がつかない' },
+      { key:'a2', label:'商は立つが、途中のひき算でよく間違う' } ]},
+    causes:{ a1:['cause-ku'], a2:['cause-sub'] } },
+  { id:'caseB', grade:'小3', title:'3桁の筆算（足し算・引き算）',
+    symptom:'繰り上がり・繰り下がりの処理ミスが多い',
+    causes:{ main:['cause-sakura'] } },
+  { id:'caseC', grade:'小2', title:'九九',
+    symptom:'7の段・8の段で止まる',
+    causes:{ main:['cause-kuku'] } },
+  { id:'caseD', grade:'小5', title:'異分母分数の足し算',
+    symptom:'分母どうしを足してしまう',
+    branch:{ q:'どちらの様子に近いですか？', options:[
+      { key:'d1', label:'分数の大きさのイメージが弱い（1/2と1/3の大小など）' },
+      { key:'d2', label:'通分の手順でつまずく（そろえる分母が見つからない）' } ]},
+    causes:{ d1:['cause-frac'], d2:['cause-lcm'] } },
+];
+const CAUSES = {
+  'cause-ku': { name:'九九の逆算（あまりのある割り算）', grade:'小3の内容',
+    why:'割り算の筆算で商を立てるとは、「わる数×□が、わられる数を超えない最大」を見つけることです。九九を逆から使う力と、あまりのある割り算の感覚が土台になっています。',
+    points:['九九は「6×7＝42」のように、答えから段を思い出す逆向きの練習が効きます','47÷6なら「6の段で47に一番近いのは42（×7）」と、見当をつける言い方を声に出させます','あまりは必ず「わる数より小さい」ことを、毎回確認する習慣をつけます'] },
+  'cause-sub': { name:'2桁−2桁の引き算（繰り下がり）', grade:'小2の内容',
+    why:'筆算の割り算は、商を立てるたびに「かける→ひく」を繰り返します。繰り下がりのある引き算が不安定だと、筆算の途中計算で崩れてしまいます。',
+    points:['繰り下がりは「となりの位から10を借りる」を、メモ枠に数字を書いて確かめながら進めます','一の位から引けないときに声に出して「借りてくる」と言わせると、手順が固定されます','検算（差＋引く数＝引かれる数）を1問だけでも入れると、ミスへの気づきが育ちます'] },
+  'cause-sakura': { name:'10の合成・分解（さくらんぼ計算）', grade:'小1の内容',
+    why:'繰り上がりは「10のまとまりを作る」操作です。8＋5なら、5を2と3に分けて8と2で10を作る。この「10を作る分解」が自動化されていないと、3桁の筆算でも繰り上がりのたびに止まります。',
+    points:['「あといくつで10」は、指やおはじきで見える形から始めます','さくらんぼ図（数を2つに分ける枝）を書いてから計算する順序を守ります','10の合成（3と7、4と6…）は、短い時間でよいので毎日触れると定着します'] },
+  'cause-kuku': { name:'同数累加（九九の土台）', grade:'小2の内容',
+    why:'九九は暗唱の前に「同じ数を何回も足す」意味の理解が土台です。7の段・8の段で止まるのは、数が大きくなるほど累加のイメージが追いつかないためで、意味に戻ると暗唱も安定します。',
+    points:['7×4は「7＋7＋7＋7」。まず累加で書いてから答える順序にします','丸をグループで描く（7個のまとまりが4つ）と、量のイメージが持ちやすくなります','止まったら1つ前の答えに段の数を足す「＋7作戦」が使えることを伝えます'] },
+  'cause-frac': { name:'分数の意味（1をいくつに分けたか）', grade:'小3〜小4の内容',
+    why:'分数は「1（全体）を等しくいくつに分けたか（分母）」と「そのいくつ分か（分子）」の2つの数でできています。分母どうしを足してしまうのは、分母を「分けた数」ではなく普通の数として扱っているサインです。',
+    points:['テープ図や円を等分する活動で、「分母＝分けた数」を体で確かめます','1/4は「4つに分けた1つ分」。言葉で言い直す練習を入れます','大きさ比べ（1/2と1/4、どちらが大きい？）を図で確認すると、計算の見当が育ちます'] },
+  'cause-lcm': { name:'倍数・公倍数', grade:'小5の内容',
+    why:'通分は「分母どうしの公倍数にそろえる」操作です。倍数を順に書き出す力と、共通の倍数を見つける感覚が弱いと、通分の第一歩で止まってしまいます。',
+    points:['倍数は「段の答え」と同じ並び。九九の段とつなげて思い出させます','2つの数の倍数を並べて書き、共通のものに○をつける手順を型にします','最小公倍数が見つかったら、それが「そろえる分母」であることを言葉で確認します'] },
+};
+function diagnose(caseId, branchKey){
+  const c = DIAGNOSIS_DATA.find(x => x.id === caseId);
+  if(!c) return [];
+  const ids = c.causes[branchKey || 'main'] || [];
+  return ids.map(id => ({ id, ...CAUSES[id] }));
+}
+
+/* =====================================================================
+   プリント生成モジュール：原因ごとに「例題1＋ガイドつき練習＋補助なし練習」を
+   ランダム生成する。各 generator は {example, guided[], plain[]} を返す。
+   q/a はHTML文字列。aFull=true のとき a は解答版の完全なHTML（筆算用）。
+   ===================================================================== */
+const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const shuffle = a => { const r = [...a]; for(let i = r.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; } return r; };
+function uniqGen(make, key, n, tries = 300){
+  const out = [], seen = new Set();
+  let t = 0;
+  while(out.length < n && t++ < tries){ const it = make(); const k = key(it); if(seen.has(k)) continue; seen.add(k); out.push(it); }
+  return out;
+}
+const B = (txt, sm) => '<span class="blank' + (sm ? ' sm' : '') + '">' + (txt || '') + '</span>';
+const FR = (n, d) => '<span class="frac"><span class="n">' + n + '</span><span class="d">' + d + '</span></span>';
+
+/* --- 筆算（ひき算）の表 --- */
+function hissHTML(a, b, opts){
+  opts = opts || {};
+  const aT = Math.floor(a / 10), aO = a % 10, bT = Math.floor(b / 10), bO = b % 10;
+  const res = a - b, rT = Math.floor(res / 10), rO = res % 10;
+  const memoT = opts.memo && aO < bO ? '<span class="memo">' + (opts.ansMode ? (aT - 1) : '') + '</span>' : '';
+  const memoO = opts.memo && aO < bO ? '<span class="memo">' + (opts.ansMode ? (10 + aO) : '') + '</span>' : '';
+  const ansRow = opts.ansMode
+    ? '<td>' + rT + '</td><td>' + rO + '</td>'
+    : '<td>&nbsp;</td><td>&nbsp;</td>';
+  return '<table class="hiss"><tr><td></td><td>' + memoT + aT + '</td><td>' + memoO + aO + '</td></tr>'
+    + '<tr><td>−</td><td>' + bT + '</td><td>' + bO + '</td></tr>'
+    + '<tr class="bar"><td></td><td></td><td></td></tr>'
+    + '<tr><td></td>' + ansRow + '</tr></table>';
+}
+
+/* --- 九九の逆算（あまりのある割り算） --- */
+function genKuItem(guided){
+  const d = rnd(3, 9); let q = rnd(3, 9); let r = rnd(1, d - 1);
+  const n = d * q + r;
+  const qhtml = n + ' ÷ ' + d + ' ＝ ' + B() + ' あまり ' + B('', true);
+  const scaf = guided ? '<div class="scaffold">' + d + 'のだん： ' + d + '×' + (q - 1) + '＝' + (d * (q - 1)) + '、' + d + '×' + q + '＝' + (d * q) + '、' + d + '×' + (q + 1) + '＝' + (d * (q + 1)) + ' → ' + n + 'に いちばん 近いのは？</div>' : '';
+  return { q: qhtml + scaf, a: n + ' ÷ ' + d + ' ＝ <span class="ans">' + q + '</span> あまり <span class="ans">' + r + '</span>', key: n + '/' + d };
+}
+function dotsGroupSVG(n, d){
+  const q = Math.floor(n / d), r = n % d;
+  let circles = '', x = 6, y = 6;
+  const put = (cx, cy, fill) => '<circle cx="' + cx + '" cy="' + cy + '" r="5.5" fill="' + fill + '" stroke="#5a7a5a" stroke-width="1"/>';
+  let idx = 0;
+  for(let g = 0; g < q; g++){
+    const gx = 6 + g * 52;
+    circles += '<rect x="' + (gx - 3) + '" y="3" width="46" height="40" rx="7" fill="none" stroke="#8ab98a" stroke-width="1.6"/>';
+    for(let i = 0; i < d; i++){ circles += put(gx + 8 + (i % 4) * 11, 13 + Math.floor(i / 4) * 13, '#bcd8bc'); }
+  }
+  for(let i = 0; i < r; i++){ circles += put(6 + q * 52 + 8 + i * 11, 13, '#f2c48d'); }
+  const w = Math.max(120, q * 52 + (r ? r * 11 + 22 : 6));
+  return '<svg width="' + Math.min(w, 520) + '" height="48" viewBox="0 0 ' + w + ' 48" role="img" aria-label="丸をグループに分けた図">' + circles + '</svg>';
+}
+function genKu(count){
+  const exN = 38, exD = 5, exQ = 7, exR = 3;
+  const half = Math.ceil(count / 2);
+  return {
+    goal: '九九を 逆から 使って、商の 見当を つけられるように なろう',
+    example: { q: exN + ' ÷ ' + exD + ' の 商と あまりを 考えます。', visual: dotsGroupSVG(exN, exD),
+      think: '丸を 5こずつ 囲むと、グループが 7つ できて 3こ あまります。5のだんで 38に いちばん 近いのは 5×7＝35。だから 商は 7、あまりは 38−35＝3 です。あまり（3）は わる数（5）より 小さいことも 確かめます。',
+      a: exN + ' ÷ ' + exD + ' ＝ <span class="ans">7</span> あまり <span class="ans">3</span>' },
+    guided: uniqGen(() => genKuItem(true), i => i.key, half),
+    plain: uniqGen(() => genKuItem(false), i => i.key, count - half),
+  };
+}
+/* --- 2桁−2桁（繰り下がり） --- */
+function genSubItem(guided){
+  let a, b;
+  do { a = rnd(42, 95); b = rnd(18, 69); } while(!(a % 10 < b % 10 && a > b));
+  const q = hissHTML(a, b, { memo: true });
+  const scaf = guided ? '<div class="scaffold">一の位は 引けない → となりの位から 10を かりて、メモ枠に 書きましょう</div>' : '';
+  return { q: q + scaf, a: hissHTML(a, b, { memo: true, ansMode: true }), aFull: true, key: a + '-' + b };
+}
+function genSub(count){
+  const half = Math.ceil(count / 2);
+  return {
+    goal: '繰り下がりは、メモ枠を 使って ゆっくり 確かめながら 計算しよう',
+    example: { q: '53 − 28 を 筆算で 計算します。', visual: hissHTML(53, 28, { memo: true, ansMode: true }),
+      think: '一の位の 3 から 8 は 引けないので、十の位から 10を 借ります。5 は 4 に、3 は 13 に なります（上の小さい枠が メモ）。13−8＝5、4−2＝2 で、答えは 25 です。',
+      a: '53 − 28 ＝ <span class="ans">25</span>' },
+    guided: uniqGen(() => genSubItem(true), i => i.key, half),
+    plain: uniqGen(() => genSubItem(false), i => i.key, count - half),
+  };
+}
+/* --- 10の合成・分解（さくらんぼ） --- */
+function sakuraSVG(top, left, right, blankRight){
+  const c = (x, y, r, txt, fill) => '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + fill + '" stroke="#5a7a5a" stroke-width="1.8"/><text x="' + x + '" y="' + (y + 6) + '" text-anchor="middle" font-size="16" font-weight="700">' + txt + '</text>';
+  return '<svg width="130" height="92" viewBox="0 0 130 92" role="img" aria-label="さくらんぼ図">'
+    + '<path d="M65 30 L35 62 M65 30 L95 62" stroke="#5a7a5a" stroke-width="1.8" fill="none"/>'
+    + c(65, 20, 15, top, '#fff') + c(35, 74, 13, left, '#dcefd c'.replace(' ','')) + c(95, 74, 13, blankRight ? '' : right, '#fff') + '</svg>';
+}
+function genSakuraItem(guided){
+  if(Math.random() < 0.62){
+    const a = rnd(6, 9); const need = 10 - a; const b = rnd(need + 1, 9); const rest = b - need;
+    const scaf = guided ? '<div>' + sakuraSVG(b, need, rest, true) + '</div><div class="scaffold">' + a + 'と あわせて 10に なるのは ' + need + '。' + b + 'を ' + need + ' と ' + B('', true) + ' に 分けます</div>' : '';
+    return { q: a + ' ＋ ' + b + ' ＝ ' + B() + scaf, a: a + ' ＋ ' + b + ' ＝ <span class="ans">' + (a + b) + '</span>', key: a + '+' + b };
+  }
+  const c = rnd(11, 17); const y = rnd((c % 10) + 2, 9);
+  const scaf = guided ? '<div class="scaffold">' + c + 'を 10と ' + (c - 10) + ' に 分けて、10 − ' + y + ' ＝ ' + (10 - y) + '、のこりの ' + (c - 10) + ' と あわせると？</div>' : '';
+  return { q: c + ' − ' + y + ' ＝ ' + B() + scaf, a: c + ' − ' + y + ' ＝ <span class="ans">' + (c - y) + '</span>', key: c + '-' + y };
+}
+function genSakura(count){
+  const half = Math.ceil(count / 2);
+  return {
+    goal: '「あといくつで 10」を 使って、10の まとまりを 作ろう',
+    example: { q: '8 ＋ 5 を 考えます。', visual: sakuraSVG(5, 2, 3, false),
+      think: '8と あわせて 10に なるのは 2。だから 5を 2と 3に 分けます（さくらんぼ図）。8＋2＝10、のこりの 3を 足して 13 です。',
+      a: '8 ＋ 5 ＝ <span class="ans">13</span>' },
+    guided: uniqGen(() => genSakuraItem(true), i => i.key, half),
+    plain: uniqGen(() => genSakuraItem(false), i => i.key, count - half),
+  };
+}
+/* --- 同数累加（九九） --- */
+function dotGroups(dan, k){
+  let rows = '';
+  for(let i = 0; i < k; i++) rows += '<div>' + '●'.repeat(dan) + '</div>';
+  return '<div style="font-size:.8em; letter-spacing:.18em; color:#48795a; line-height:1.5">' + rows + '</div>';
+}
+function genKukuItem(guided){
+  const dan = Math.random() < 0.55 ? 7 : 8; const k = rnd(3, 9);
+  const adds = Array(k).fill(dan);
+  const scaf = guided ? '<div class="scaffold">' + adds.map((v, i) => i < 2 ? v : '□').join(' ＋ ') + ' ＝ ' + B() + '</div>' + dotGroups(dan, Math.min(k, 5)) + (k > 5 ? '<div class="scaffold">（丸の図は 5れつまで）</div>' : '') : '';
+  return { q: dan + ' × ' + k + ' ＝ ' + B() + scaf, a: dan + ' × ' + k + ' ＝ <span class="ans">' + (dan * k) + '</span>', key: dan + 'x' + k };
+}
+function genKuku(count){
+  const half = Math.ceil(count / 2);
+  return {
+    goal: '九九は「同じ数を 何回も 足す」こと。止まったら 累加に もどろう',
+    example: { q: '7 × 4 を 考えます。', visual: dotGroups(7, 4),
+      think: '7の まとまりが 4つ。足し算で 書くと 7＋7＋7＋7。7＋7＝14、14＋7＝21、21＋7＝28。だから 7×4＝28 です。止まったら、前の答えに 7を 足す「＋7作戦」も 使えます。',
+      a: '7 × 4 ＝ <span class="ans">28</span>' },
+    guided: uniqGen(() => genKukuItem(true), i => i.key, half),
+    plain: uniqGen(() => genKukuItem(false), i => i.key, count - half),
+  };
+}
+/* --- 分数の意味 --- */
+function fracBarSVG(d, n, guideNums){
+  const w = 240, cell = w / d;
+  let cells = '', nums = '';
+  for(let i = 0; i < d; i++){
+    cells += '<rect x="' + (i * cell) + '" y="0" width="' + cell + '" height="34" fill="' + (i < n ? '#9cc79c' : '#fff') + '" stroke="#446" stroke-width="1.4"/>';
+    if(guideNums) nums += '<text x="' + (i * cell + cell / 2) + '" y="50" text-anchor="middle" font-size="11" fill="#667">' + (i + 1) + '</text>';
+  }
+  return '<svg width="' + w + '" height="' + (guideNums ? 54 : 36) + '" viewBox="0 0 ' + w + ' ' + (guideNums ? 54 : 36) + '" role="img" aria-label="分数のテープ図">' + cells + nums + '</svg>';
+}
+function genFracItem(guided){
+  const d = [3, 4, 5, 6, 8][rnd(0, 4)]; const n = rnd(1, d - 1);
+  const scaf = guided ? '<div class="scaffold">全体を ' + d + 'つに 分けています（下の数字が わけ目の 数）。色は そのうちの いくつ分？</div>' : '';
+  return { q: fracBarSVG(d, n, guided) + '<div>色のついた 部分は、全体の ' + FR(B('', true), B('', true)) + ' です' + scaf + '</div>',
+    a: '答え：' + FR('<span class="ans">' + n + '</span>', '<span class="ans">' + d + '</span>'), key: n + '/' + d };
+}
+function genFrac(count){
+  const half = Math.ceil(count / 2);
+  return {
+    goal: '分母は「いくつに 分けたか」、分子は「その いくつ分か」を 確かめよう',
+    example: { q: '分数の 読み方を 確かめます。', visual: fracBarSVG(4, 1, true),
+      think: '全体（1本のテープ）を 同じ大きさに 4つに 分けました。その 1つ分が ' + '1/4（4分の1）' + ' です。分母の 4 は「分けた数」、分子の 1 は「いくつ分か」を 表します。',
+      a: '色の部分は ' + FR('<span class="ans">1</span>', '<span class="ans">4</span>') + ' です' },
+    guided: uniqGen(() => genFracItem(true), i => i.key, half),
+    plain: uniqGen(() => genFracItem(false), i => i.key, count - half),
+  };
+}
+/* --- 倍数・公倍数 --- */
+const LCM_PAIRS = [[4, 6], [6, 8], [3, 4], [4, 8], [6, 9], [8, 12], [5, 6], [3, 6], [4, 10], [6, 10], [5, 10], [3, 8]];
+const lcm = (a, b) => { let m = Math.max(a, b); while(m % a || m % b) m++; return m; };
+function genLcmItem(guided){
+  const [a, b] = LCM_PAIRS[rnd(0, LCM_PAIRS.length - 1)];
+  const L = lcm(a, b);
+  if(guided){
+    const listA = [1, 2, 3, 4, 5].map(i => i <= 2 ? (a * i) : '□').join('、');
+    const listB = [1, 2, 3, 4, 5].map(i => i === 2 ? '□' : (b * i)).join('、');
+    return { q: a + 'の倍数： ' + listA + '、…<br>' + b + 'の倍数： ' + listB + '、…<br>いちばん小さい 公倍数は ' + B(),
+      a: a + 'と' + b + 'の 最小公倍数： <span class="ans">' + L + '</span>', key: a + ',' + b + 'g' };
+  }
+  return { q: a + ' と ' + b + ' の 最小公倍数は ' + B(), a: '<span class="ans">' + L + '</span>', key: a + ',' + b + 'p' };
+}
+function genLcm(count){
+  const half = Math.ceil(count / 2);
+  return {
+    goal: '倍数を 順に 書き出して、共通の 数に ○を つけよう',
+    example: { q: '4 と 6 の 最小公倍数を 考えます。', visual: '',
+      think: '4の倍数： 4、8、12、16、20、24…。6の倍数： 6、12、18、24…。両方に 出てくる数（公倍数）は 12、24…で、いちばん小さいのは 12 です。これが 通分で そろえる 分母に なります。',
+      a: '4と6の 最小公倍数： <span class="ans">12</span>' },
+    guided: uniqGen(() => genLcmItem(true), i => i.key, half),
+    plain: uniqGen(() => genLcmItem(false), i => i.key, count - half),
+  };
+}
+const GENERATORS = { 'cause-ku': genKu, 'cause-sub': genSub, 'cause-sakura': genSakura, 'cause-kuku': genKuku, 'cause-frac': genFrac, 'cause-lcm': genLcm };
+
+/* =====================================================================
+   画面の描画・状態管理
+   ===================================================================== */
+const LS_KEY = 'tsumazuki-settings';
+const state = {
+  caseId: null, branchKey: null, causeId: null,
+  showAnswers: false, data: null,
+  settings: Object.assign({ grid: true, fs: '', lh: '', count: 10, bg: '', deco: false },
+    JSON.parse(localStorage.getItem(LS_KEY) || '{}')),
+};
+function saveSettings(){ localStorage.setItem(LS_KEY, JSON.stringify(state.settings)); }
+
+/* --- 診断UI --- */
+function renderCases(){
+  document.getElementById('caseList').innerHTML = DIAGNOSIS_DATA.map(c =>
+    '<button class="case-card' + (state.caseId === c.id ? ' on' : '') + '" data-id="' + c.id + '">'
+    + '<span class="g">' + c.grade + '</span><span class="t">' + c.title + '</span>'
+    + '<span class="d">' + c.symptom + '</span></button>').join('');
+  document.querySelectorAll('.case-card').forEach(b => b.addEventListener('click', ()=>{
+    state.caseId = b.dataset.id; state.branchKey = null; state.causeId = null; state.data = null;
+    renderCases(); renderBranch(); renderDiagResult(); renderSheet();
+  }));
+}
+function renderBranch(){
+  const box = document.getElementById('branchBox');
+  const c = DIAGNOSIS_DATA.find(x => x.id === state.caseId);
+  if(!c || !c.branch){ box.innerHTML = ''; return; }
+  box.innerHTML = '<p class="branch-q">' + c.branch.q + '</p><div class="btnrow">'
+    + c.branch.options.map(o => '<button class="btn ' + (state.branchKey === o.key ? '' : 'sub') + '" data-k="' + o.key + '">' + o.label + '</button>').join('') + '</div>';
+  box.querySelectorAll('[data-k]').forEach(b => b.addEventListener('click', ()=>{
+    state.branchKey = b.dataset.k; renderBranch(); renderDiagResult();
+  }));
+}
+function renderDiagResult(){
+  const box = document.getElementById('diagResult');
+  const c = DIAGNOSIS_DATA.find(x => x.id === state.caseId);
+  if(!c){ box.innerHTML = ''; return; }
+  if(c.branch && !state.branchKey){ box.innerHTML = '<p class="small">上の質問に答えると、原因が出ます。</p>'; return; }
+  const causes = diagnose(state.caseId, state.branchKey);
+  box.innerHTML = causes.map(ca =>
+    '<div class="cause-box"><h3>🎯 根本原因の候補：' + ca.name + '</h3>'
+    + '<div class="small">前提になるのは ' + ca.grade + ' です</div>'
+    + '<p style="margin:7px 0 0">' + ca.why + '</p>'
+    + '<div style="font-weight:700; margin-top:8px">指導のポイント</div><ul>'
+    + ca.points.map(p => '<li>' + p + '</li>').join('') + '</ul>'
+    + '<div class="btnrow"><button class="btn acc" data-cause="' + ca.id + '">📄 この原因のプリントを作る</button></div></div>').join('');
+  box.querySelectorAll('[data-cause]').forEach(b => b.addEventListener('click', ()=>{
+    state.causeId = b.dataset.cause; state.showAnswers = false;
+    document.getElementById('ansBtn').textContent = '✅ 解答を見る';
+    generate(); renderSheet();
+    document.getElementById('sheet').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }));
+}
+
+/* --- プリント生成と描画 --- */
+function generate(){
+  if(!state.causeId) return;
+  state.data = GENERATORS[state.causeId](state.settings.count);
+}
+function probHTML(item, idx, showAns){
+  let inner;
+  if(showAns && item.aFull) inner = item.a;
+  else inner = item.q + (showAns ? ' <span style="margin-left:8px">→ ' + item.a + '</span>' : '');
+  return '<div class="prob"><span class="qn">(' + idx + ')</span>' + inner + '</div>';
+}
+function renderSheet(){
+  const sheet = document.getElementById('sheet');
+  sheet.className = [state.settings.grid ? 'grid' : '', state.settings.fs, state.settings.lh, state.settings.bg, compactFit ? 'compact' : ''].filter(Boolean).join(' ');
+  if(!state.causeId || !state.data){
+    sheet.innerHTML = '<div style="text-align:center; padding:70px 20px; color:#678">'
+      + '<div style="font-size:2.2rem">🌱</div>'
+      + '<p style="font-weight:700">左の「1. つまずき診断」から始めると、<br>ここに補助プリントができます</p>'
+      + '<p class="small">誤答パターン → 根本原因の特定 → 原因だけを練習するプリント、の順に進みます</p></div>';
+    return;
+  }
+  const ca = CAUSES[state.causeId], d = state.data, dec = state.settings.deco ? '<span class="deco">🌸</span> ' : '';
+  let n = 0;
+  const list = arr => '<div class="probs">' + arr.map(it => probHTML(it, ++n, state.showAnswers)).join('') + '</div>';
+  sheet.innerHTML =
+    '<div class="sheet-head"><span class="ttl">' + dec + ca.name + ' ― スモールステップれんしゅう' + (state.settings.deco ? ' <span class="deco">⭐</span>' : '') + '</span>'
+    + '<span class="name">なまえ：＿＿＿＿＿＿＿＿　　＿＿月＿＿日</span></div>'
+    + '<div class="goal">🎯 きょうのめあて：' + d.goal + '</div>'
+    + '<div class="sec-ttl"><span class="no">例題</span>まずは いっしょに 考えよう</div>'
+    + '<div class="ex-box"><div style="font-weight:700">' + d.example.q + '</div>'
+    + '<div class="ex-flex">' + (d.example.visual ? '<div class="ex-vis" style="margin:7px 0">' + d.example.visual + '</div>' : '')
+    + '<div class="think">💡 ' + d.example.think + '</div></div>'
+    + (state.showAnswers ? '<div style="margin-top:5px">答え：' + d.example.a + '</div>' : '')
+    + '</div>'
+    + '<div class="sec-ttl"><span class="no">れんしゅう①</span>ガイドつきで やってみよう</div>' + list(d.guided)
+    + '<div class="sec-ttl"><span class="no">れんしゅう②</span>じりきで チャレンジ</div>' + list(d.plain)
+    + '<div class="foot-note">' + (state.settings.deco ? 'よく がんばりました 🌸　' : '') + 'まちがえたら、例題と ガイドを 見直して もう一度。 ― 算数つまずき診断＆補助プリント</div>';
+  fitSheet();
+}
+let compactFit = false;
+/* A4縦1枚に収める：①余白を詰める → ②練習を3カラムにする → ③文字サイズを実寸で下げる
+   （CSS zoomは印刷に効かないため、レイアウトそのものを変える方式にする） */
+function fitSheet(){
+  const sheet = document.getElementById('sheet');
+  const targetPx = sheet.clientWidth * (297 / 210) * 0.982; /* 印刷時の丸め誤差ぶんの安全マージン */
+  sheet.style.removeProperty('--pfs');
+  sheet.querySelectorAll('.probs').forEach(p => p.classList.remove('cols3'));
+  if(sheet.scrollHeight <= targetPx) return;
+  if(!compactFit){ compactFit = true; sheet.classList.add('compact'); }
+  if(sheet.scrollHeight <= targetPx) return;
+  sheet.querySelectorAll('.probs').forEach(p => p.classList.add('cols3'));
+  if(sheet.scrollHeight <= targetPx) return;
+  let pfs = 16;
+  for(let i = 0; i < 4 && sheet.scrollHeight > targetPx; i++){
+    pfs = Math.max(7, pfs * (targetPx / sheet.scrollHeight));
+    sheet.style.setProperty('--pfs', pfs + 'px');
+  }
+}
+
+/* --- 設定UI --- */
+function segWire(id, key, after){
+  const el = document.getElementById(id);
+  el.querySelectorAll('button').forEach(b => {
+    b.classList.toggle('on', String(state.settings[key]) === b.dataset.v);
+    b.addEventListener('click', ()=>{
+      state.settings[key] = key === 'count' ? Number(b.dataset.v) : b.dataset.v;
+      el.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+      saveSettings(); if(after) after(); renderSheet();
+    });
+  });
+}
+function toggleWire(id, key, after){
+  const el = document.getElementById(id);
+  const paint = () => { el.classList.toggle('on', !!state.settings[key]); el.textContent = state.settings[key] ? 'ON' : 'OFF'; };
+  paint();
+  el.addEventListener('click', ()=>{ state.settings[key] = !state.settings[key]; saveSettings(); paint(); if(after) after(); renderSheet(); });
+}
+segWire('segFs', 'fs'); segWire('segLh', 'lh'); segWire('segBg', 'bg');
+segWire('segCnt', 'count', generate);
+toggleWire('tgGrid', 'grid'); toggleWire('tgDeco', 'deco');
+document.getElementById('regenBtn').addEventListener('click', ()=>{ generate(); renderSheet(); });
+document.getElementById('ansBtn').addEventListener('click', (e)=>{
+  state.showAnswers = !state.showAnswers;
+  e.currentTarget.textContent = state.showAnswers ? '📝 問題にもどす' : '✅ 解答を見る';
+  renderSheet();
+});
+document.getElementById('printBtn').addEventListener('click', ()=>{ fitSheet(); window.print(); });
+window.addEventListener('beforeprint', fitSheet);
+renderCases(); renderBranch(); renderDiagResult(); renderSheet();
+</script>
+</body>
+</html>
