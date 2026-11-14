@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>算数つまずき診断＆補助プリント ― つまずきの原因から作るスモールステッププリント</title>
-<meta name="description" content="児童の誤答パターンから算数のつまずきの根本原因を逆算し、その原因だけを練習できるA4補助プリントを生成する教員向けツール。記録は端末内のみ、児童の個人情報は扱いません。">
+<title>算数・数学つまずき診断＆補助プリント ― つまずきの原因から作るスモールステッププリント</title>
+<meta name="description" content="児童・生徒の誤答パターンから算数・数学のつまずきの根本原因を逆算し、その原因だけを練習できるA4補助プリントを生成する教員向けツール。記録は端末内のみ、児童の個人情報は扱いません。">
 <meta name="apple-mobile-web-app-title" content="つまずき診断プリント">
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="apple-touch-icon" href="icon-180.png">
-<meta property="og:title" content="算数つまずき診断＆補助プリント">
+<meta property="og:title" content="算数・数学つまずき診断＆補助プリント">
 <meta property="og:description" content="誤答パターンから根本原因を逆算し、原因だけを練習できるA4補助プリントを即生成する教員向けツール。">
 <meta property="og:image" content="og.png">
 <meta property="og:type" content="website">
@@ -89,6 +89,8 @@ label.f{display:block; font-size:.86rem; font-weight:700; margin:11px 0 4px;}
 .frac{display:inline-flex; flex-direction:column; text-align:center; vertical-align:-.55em; margin:0 3px; line-height:1.15; font-size:.94em;}
 .frac .n{border-bottom:2.2px solid currentColor; padding:0 .38em;}
 .frac .d{padding:0 .38em;}
+.var{font-family:"Times New Roman","Hiragino Mincho ProN",serif; font-style:italic;}
+.rad{border-top:.065em solid currentColor; padding:0 .14em 0 .06em; margin-left:.02em;}
 .scaffold{font-size:.88em; color:#476b52; margin-top:3px;}
 .deco{font-size:1.05em;}
 .foot-note{margin-top:14px; font-size:.8em; color:#667;}
@@ -126,14 +128,14 @@ svg text{font-family:inherit;}
 </head>
 <body>
 <header class="top">
-  <h1>🔍 算数つまずき診断＆補助プリント</h1>
+  <h1>🔍 算数・数学つまずき診断＆補助プリント</h1>
   <p>誤答パターンから「つまずきの根本原因」を逆算し、その原因だけを練習できるA4プリントを作る、先生のための道具です</p>
 </header>
 <main>
   <div class="no-print">
     <section class="panel" id="diagPanel">
       <h2>1. つまずき診断</h2>
-      <p class="small">児童の様子にいちばん近いものを選んでください。根本原因（前提単元の抜け）と、指導のポイント・作れるプリントが出ます。</p>
+      <p class="small">児童・生徒の様子にいちばん近いものを選んでください。根本原因（前提単元の抜け）と、指導のポイント・作れるプリントが出ます。</p>
       <div id="caseList"></div>
       <div id="branchBox"></div>
       <div id="diagResult"></div>
@@ -160,7 +162,7 @@ svg text{font-family:inherit;}
         <button class="btn sub" id="regenBtn">🎲 数字を変える</button>
         <button class="btn acc" id="ansBtn">✅ 解答を見る</button>
       </div>
-      <p class="small">A4縦・1枚に収まるよう自動調整します。解答プリントも同じボタンで切り替えて印刷できます。児童の名前などは保存しません（なまえ欄は印刷後に手書きしてください）。（版：v1.1）</p>
+      <p class="small">A4縦・1枚に収まるよう自動調整します。解答プリントも同じボタンで切り替えて印刷できます。児童・生徒の名前などは保存しません（なまえ欄は印刷後に手書きしてください）。（版：v2.0）</p>
     </section>
   </div>
   <div class="sheet-wrap">
@@ -194,6 +196,51 @@ const DIAGNOSIS_DATA = [
       { key:'d1', label:'分数の大きさのイメージが弱い（1/2と1/3の大小など）' },
       { key:'d2', label:'通分の手順でつまずく（そろえる分母が見つからない）' } ]},
     causes:{ d1:['cause-frac'], d2:['cause-lcm'] } },
+{ id:'caseE', grade:'小5', title:'割合',
+    symptom:'量が変わると割合も変わると思っている／百分率と倍が結びつかない',
+    branch:{ q:'どちらの様子に近いですか？', options:[
+      { key:'e1', label:'「もとにする量」がつかめない（比べる量÷もとにする量が立てられない）' },
+      { key:'e2', label:'百分率・小数・倍の直し方でつまずく（10％増量＝1.1倍など）' } ]},
+    causes:{ e1:['cause-wariai'], e2:['cause-percent'] } },
+  { id:'caseF', grade:'小5', title:'分数・通分の意味',
+    symptom:'計算はできても、通分の意味や数直線の目盛りが分からない',
+    causes:{ main:['cause-tanibunsu'] } },
+  { id:'caseG', grade:'小5', title:'速さ',
+    symptom:'速さを足してしまう／道のりと時間が違うと比べられない',
+    causes:{ main:['cause-hayasa'] } },
+  { id:'caseH', grade:'小5', title:'体積・面積の公式',
+    symptom:'体積の式に面積の公式や円周率を混ぜる／周と面積を混同する',
+    branch:{ q:'どちらの様子に近いですか？', options:[
+      { key:'h1', label:'体積の公式に、面積の公式や円周率が混ざる' },
+      { key:'h2', label:'周の長さと面積を取り違える' } ]},
+    causes:{ h1:['cause-taiseki'], h2:['cause-shuumen'] } },
+  { id:'caseI', grade:'小5', title:'小数のわり算',
+    symptom:'大きい数÷小さい数にしてしまう／片方だけ10倍してしまう',
+    branch:{ q:'どちらの様子に近いですか？', options:[
+      { key:'i1', label:'立式や商の大きさの見当でつまずく（わる数が1より小さい場合など）' },
+      { key:'i2', label:'筆算で、わられる数を10倍し忘れる' } ]},
+    causes:{ i1:['cause-warizan-imi'], i2:['cause-warizan-hissan'] } },
+  { id:'caseL', grade:'中1', title:'一次方程式の立式',
+    symptom:'方程式は解けるのに、文章題で式が立てられない',
+    causes:{ main:['cause-ritsushiki'] } },
+  { id:'caseO', grade:'中1', title:'正負の数の概念',
+    symptom:'計算はできるが、絶対値・大小・自然数の範囲で間違う',
+    causes:{ main:['cause-seifu'] } },
+  { id:'caseM', grade:'中1・2', title:'文字式',
+    symptom:'等式変形の符号ミス／数量を文字式に表せない',
+    branch:{ q:'どちらの様子に近いですか？', options:[
+      { key:'m1', label:'等式変形（yについて解く・移項）で符号を間違う' },
+      { key:'m2', label:'数量を文字式で表せない（連続する偶数など）' } ]},
+    causes:{ m1:['cause-toshiki'], m2:['cause-moji'] } },
+  { id:'caseJ', grade:'中2', title:'一次関数の変化の割合',
+    symptom:'隣合うyの差を、そのまま変化の割合にしてしまう',
+    causes:{ main:['cause-henka'] } },
+  { id:'caseK', grade:'中2', title:'図形の証明',
+    symptom:'証明の流れが組み立てられない／結論を根拠に使ってしまう',
+    causes:{ main:['cause-shomei'] } },
+  { id:'caseN', grade:'中3', title:'平方根の意味',
+    symptom:'有理化などの計算はできても、√の大きさや性質が分からない',
+    causes:{ main:['cause-heihokon'] } },
 ];
 const CAUSES = {
   'cause-ku': { name:'九九の逆算（あまりのある割り算）', grade:'小3の内容',
@@ -214,6 +261,51 @@ const CAUSES = {
   'cause-lcm': { name:'倍数・公倍数', grade:'小5の内容',
     why:'通分は「分母どうしの公倍数にそろえる」操作です。倍数を順に書き出す力と、共通の倍数を見つける感覚が弱いと、通分の第一歩で止まってしまいます。',
     points:['倍数は「段の答え」と同じ並び。九九の段とつなげて思い出させます','2つの数の倍数を並べて書き、共通のものに○をつける手順を型にします','最小公倍数が見つかったら、それが「そろえる分母」であることを言葉で確認します'] },
+'cause-wariai': { name:'割合の意味（もとにする量を1と見る）', grade:'小5の内容',
+    why:'割合は「もとにする量（全体）を1と見たとき、比べる量がその何倍か」です。量そのものと割合を混同するのは、この「1と見る」基準が持てていないサインです。全国学力調査でも割合は正答率21.6％（令和4年度）など最も低い水準が続いています。',
+    points:['まず「全体（もとにする量）はどれか」を指で押さえてから、式を立てさせます','テープ図で全体を描き、比べる量の部分を色で示すと、基準が見えます','「比べる量 ÷ もとにする量 ＝ 割合」を、数値を入れる前に言葉で言わせます'] },
+  'cause-percent': { name:'百分率・小数・倍の変換', grade:'小5の内容',
+    why:'百分率は割合の表し方の一つで、100％＝1（倍）です。「10％増量＝1.1倍」が分からないのは、百分率と倍・小数の行き来が自動化されていないためです（令和7年度の正答率41.3％）。',
+    points:['数直線の上に ％・小数・倍 を並べて書く対応表を作ると、変換の型になります','「増し・引き」は、増えた後の全体が何倍かで考えさせます（10％増し→110％→1.1倍）','％を小数に直すときは「÷100」、逆は「×100」と、操作を言葉で固定します'] },
+  'cause-tanibunsu': { name:'単位分数で見る見方（通分の意味）', grade:'小4〜小5の内容',
+    why:'通分は「単位分数（1つ分の大きさ）をそろえる」操作です。計算手順はできても意味が伴わないと、数直線の目盛りや分数の大小でつまずきます（令和7年度：計算81.5％に対し、通分の意味の記述23.3％、数直線35.4％）。',
+    points:['「1/12の何個分？」と、単位分数の個数で言い直す練習を入れます','テープ図を細かく分け直す活動で、通分を「分け直し」として体験させます','数直線では「全体（0〜2）を1と見ない」ことを、目盛りの数え方で確かめます'] },
+  'cause-hayasa': { name:'単位量あたりの大きさ（速さ）', grade:'小5の内容',
+    why:'速さは「道のり ÷ 時間」で得られる単位量あたりの大きさです。2区間とも分速200mなのに全体を分速400mとする「速さを足す」誤答（令和6年度、正答率54.4％）は、この考えが未定着なサインです。',
+    points:['比べるときは「1分あたり」にそろえることを、合言葉にします','道のりと時間を表に書き、割り算の意味（1分分を求める）を言葉で確認します','答えの単位（分速○m）を必ず書かせると、意味への意識が育ちます'] },
+  'cause-taiseki': { name:'体積の意味（1cm³の何個分）', grade:'小5の内容',
+    why:'体積の公式は「1cm³の立方体が何個入るか」を数える式です。意味が弱いと、体積の式に面積の公式や円周率を混入させます（令和6年度、正答率36.9％。式は書けても体積の意味は40.4％）。',
+    points:['「底面に何個 × 何段」で数える図から公式につなげます','式を立てる前に「これは体積？ 面積？」と量の種類を言わせます','単位（cm³ と cm²）の違いを、答えを書くときに毎回確認します'] },
+  'cause-shuumen': { name:'周の長さと面積の区別', grade:'小4の内容',
+    why:'周は「まわりを1周した長さ」、面積は「中身の広さ」で、量の種類が違います。式（足し算ベースと掛け算）と単位（cm と cm²）の両面で区別する習慣が土台です。',
+    points:['図のまわりを指でなぞる（周）、中を手で覆う（面積）と、体の動きで区別します','式の前に「まわり？ 中身？」と問いかけます','答えの単位までセットで書かせます'] },
+  'cause-warizan-imi': { name:'小数のわり算の意味と商の見積もり', grade:'小5の内容',
+    why:'「大きい数 ÷ 小さい数」という機械的な立式や、「商は必ず小さくなる」という思い込みが誤答のもとです。わる数が1より小さいと商は大きくなること、場面（何人分・何倍）で式を決めることが土台になります。',
+    points:['計算の前に「商は元の数より大きくなる？ 小さくなる？」の見当を必ず言わせます','数直線に わる数 ずつ区切る図で、包含除の意味を確かめます','問題文の場面を絵や図に直してから立式させます'] },
+  'cause-warizan-hissan': { name:'小数÷小数の筆算の型（そろって10倍）', grade:'小5の内容',
+    why:'小数でわる筆算は、わる数とわられる数を同じだけ大きく（10倍など）しても商が変わらない性質を使います。片方だけ10倍するのが典型的な誤答です。',
+    points:['「両方に同じ数をかける」を、式の変形として毎回書かせます','まず「わる数を整数にする」ことを宣言してから筆算に入ります','商の大きさの見当（原因：商の見積もり）と組み合わせると、桁の間違いに気づけます'] },
+  'cause-ritsushiki': { name:'等しい数量を2通りに表す（立式）', grade:'中1の内容',
+    why:'方程式の立式は「等しい数量を2通りに表して＝でつなぐ」ことです。解く計算（71.8％）に比べ立式の正答率は21.1％と突出して低く（山梨県学力把握調査）、数量の整理の段階でつまずいています。',
+    points:['数量を表に書き、「同じものを2通りに表す」箇所に印をつけさせます','何を x と置くかを、式の前に言葉で宣言させます','単位（円・個・人）をそろえてから式にします'] },
+  'cause-seifu': { name:'正負の数の概念（絶対値・大小・自然数）', grade:'中1の内容',
+    why:'正負の数の計算自体は正答率が高い一方、概念面が弱点です（自然数の意味46.6％、絶対値と大小42.4％など、全国学力調査・県調査）。絶対値を「0からの距離」、自然数を「数える数」と、言葉の意味から捉え直すことが土台です。',
+    points:['絶対値は数直線で「0からの距離」として示し、符号と切り離して考えさせます','負の数どうしの大小は、数直線の位置（右にある方が大きい）で確かめます','自然数・整数・数、の含む関係を図で整理します'] },
+  'cause-toshiki': { name:'等式の性質（等式変形）', grade:'中1〜中2の内容',
+    why:'等式変形の正答率は53.1％（令和6年度）で、移項の符号ミスが典型です。「両辺に同じ操作をする」という等式の性質で理解すると、符号の暗記に頼らずに済みます。',
+    points:['天秤の図で「両辺から同じものを取る」イメージを持たせます','変形の各行で「何をしたか」を横に書かせます','移項は「反対側へ移すと符号が変わる」結果として、操作の後に確認させます'] },
+  'cause-moji': { name:'文字は数の代表（文字式で表す）', grade:'中1の内容',
+    why:'連続する偶数を n で表す問題の正答率は35.5％（令和6年度）など、数量を文字式に表すことが弱点です。具体的な数で成り立つ関係を、文字に置き換える経験が土台になります。',
+    points:['まず具体的な数（偶数6→次は8）で関係を確かめてから、文字に置き換えさせます','「文字は、まだ決まっていない数の代表」と言葉で確認します','表した式に具体的な数を当てはめて、合っているか検算させます'] },
+  'cause-henka': { name:'変化の割合（増加量の比）', grade:'中2の内容',
+    why:'変化の割合は「yの増加量 ÷ xの増加量」です。「隣合うyの差」をそのまま答える誤答が多く、正答率は38.7％（令和4年度）、yの増加量を求める問題は35.4％（令和7年度）にとどまります。',
+    points:['表では、xの増加量とyの増加量を上下に並べて書き、比を取る習慣をつけます','xが1増える場合と、2・3増える場合を並べて見せます','答える前に「xはいくつ増えたか」を必ず確認させます'] },
+  'cause-shomei': { name:'証明の構想（結論からの逆向き設計）', grade:'中2の内容',
+    why:'証明の正答率は26.5％（令和6年度）など低く、誤った等しい辺で合同を主張したり、結論を根拠に使ったりする誤答が見られます。「結論を言うには何が必要か」を逆向きにたどる構想力が土台です。',
+    points:['書く前に「結論←合同←条件」の流れ図を作らせます','等しい辺・角の1つ1つに「仮定のどこから来たか」を対応づけさせます','合同条件は、必要な組がそろったかチェックリストで確認させます'] },
+  'cause-heihokon': { name:'平方根の意味（2乗するとその数になる数）', grade:'中3の内容',
+    why:'√a は「2乗すると a になる正の数」です。有理化などの計算はできても、√の大小や性質の理解が弱い生徒がいます。根拠について：全国学力・学習状況調査は4月実施で中3の内容が出題されないため全国の正答率はなく、愛知県高校入学者調査では「平方根の性質を選ぶ問題25.6％（有理化の計算は78.1％）」でした。',
+    points:['大きさ比べは「両方を2乗して比べる」を型にします','数直線の上に √ を置く活動で、近似値の見当を持たせます','√a² ＝ a（a＞0）など、性質は定義から確かめさせます'] },
 };
 function diagnose(caseId, branchKey){
   const c = DIAGNOSIS_DATA.find(x => x.id === caseId);
@@ -410,7 +502,443 @@ function genLcm(count){
     plain: uniqGen(() => genLcmItem(false), i => i.key, count - half),
   };
 }
-const GENERATORS = { 'cause-ku': genKu, 'cause-sub': genSub, 'cause-sakura': genSakura, 'cause-kuku': genKuku, 'cause-frac': genFrac, 'cause-lcm': genLcm };
+/* ===== 追加分（2026-11-15 v2.0）：小学校の5ケース・7原因 ===== */
+const V = s => '<span class="var">' + s + '</span>';
+const RAD = inner => '√<span class="rad">' + inner + '</span>';
+function tapeSVG(total, ratio, label){
+  const w = 260, pw = Math.round(w * ratio);
+  return '<svg width="' + w + '" height="46" viewBox="0 0 ' + w + ' 46" role="img" aria-label="テープ図">'
+    + '<rect x="0" y="4" width="' + w + '" height="24" fill="#fff" stroke="#446" stroke-width="1.6"/>'
+    + '<rect x="0" y="4" width="' + pw + '" height="24" fill="#9cc79c" stroke="#446" stroke-width="1.6"/>'
+    + '<text x="' + (w / 2) + '" y="43" text-anchor="middle" font-size="11.5" fill="#445">' + label + '</text></svg>';
+}
+function numLineSVG(min, max, step, marks){
+  const w = 300, x0 = 14, x1 = w - 14, y = 26;
+  const X = v => x0 + (v - min) / (max - min) * (x1 - x0);
+  let s = '<svg width="' + w + '" height="46" viewBox="0 0 ' + w + ' 46" role="img" aria-label="数直線">'
+    + '<line x1="' + x0 + '" y1="' + y + '" x2="' + x1 + '" y2="' + y + '" stroke="#446" stroke-width="1.8"/>';
+  for(let v = min; v <= max + 1e-9; v += step){
+    s += '<line x1="' + X(v) + '" y1="' + (y - 5) + '" x2="' + X(v) + '" y2="' + (y + 5) + '" stroke="#446" stroke-width="1.4"/>'
+      + '<text x="' + X(v) + '" y="' + (y + 19) + '" text-anchor="middle" font-size="11" fill="#445">' + (Math.round(v * 100) / 100) + '</text>';
+  }
+  (marks || []).forEach(m => { s += '<circle cx="' + X(m.v) + '" cy="' + y + '" r="4.5" fill="#c8433c"/>'
+    + '<text x="' + X(m.v) + '" y="' + (y - 10) + '" text-anchor="middle" font-size="11.5" font-weight="700" fill="#c8433c">' + m.label + '</text>'; });
+  return s + '</svg>';
+}
+
+
+function fracLineSVG(d){
+  const w = 300, x0 = 14, x1 = w - 14, y = 26, total = 2 * d;
+  let s = '<svg width="' + w + '" height="48" viewBox="0 0 ' + w + ' 48" role="img" aria-label="分数の数直線">'
+    + '<line x1="' + x0 + '" y1="' + y + '" x2="' + x1 + '" y2="' + y + '" stroke="#446" stroke-width="1.8"/>';
+  for(let i = 0; i <= total; i++){
+    const X = x0 + i / total * (x1 - x0);
+    const lab = i % d === 0 ? String(i / d) : (i % d) + '/' + d;
+    s += '<line x1="' + X + '" y1="' + (y - 5) + '" x2="' + X + '" y2="' + (y + 5) + '" stroke="#446" stroke-width="1.4"/>'
+      + '<text x="' + X + '" y="' + (y + 19) + '" text-anchor="middle" font-size="10.5" fill="#445">' + lab + '</text>';
+  }
+  return s + '</svg>';
+}
+/* --- 割合：もとにする量 --- */
+function genWariaiItem(guided){
+  if(Math.random() < 0.55){
+    const A = [20, 40, 50, 60, 80, 100, 120, 200][rnd(0, 7)];
+    const pc = [10, 20, 25, 30, 40, 50, 60, 75, 80, 90][rnd(0, 9)];
+    const ans = A * pc / 100;
+    const scaf = guided ? '<div>' + tapeSVG(A, pc / 100, '全体（もとにする量）＝ ' + A) + '</div><div class="scaffold">比べる量 ＝ もとにする量 × 割合（' + pc + '％ ＝ ' + (pc / 100) + '）</div>' : '';
+    return { q: A + ' の ' + pc + '％ は ' + B() + ' です' + scaf,
+      a: A + ' × ' + (pc / 100) + ' ＝ <span class="ans">' + ans + '</span>', key: 'w' + A + 'x' + pc };
+  }
+  const pairs = [[6, 30], [9, 30], [12, 40], [15, 60], [18, 90], [24, 60], [8, 40], [14, 70], [16, 80], [21, 70]];
+  const [b, A] = pairs[rnd(0, pairs.length - 1)];
+  const scaf = guided ? '<div class="scaffold">割合 ＝ 比べる量 ÷ もとにする量（' + b + ' ÷ ' + A + '）</div>' : '';
+  return { q: A + ' のうち ' + b + ' は、割合でいうと ' + B() + '（小数）です' + scaf,
+    a: b + ' ÷ ' + A + ' ＝ <span class="ans">' + (b / A) + '</span>', key: 'wr' + A + 'x' + b };
+}
+function genWariai(count){
+  const half = Math.ceil(count / 2);
+  return { goal: '割合は「もとにする量」を 1と 見て 考える。比べる量 ÷ もとにする量',
+    example: { q: '40人のクラスで、30％が女子です。女子は何人でしょう。', visual: tapeSVG(40, 0.3, '全体（もとにする量）＝ 40人'),
+      think: '割合の問題では、まず「もとにする量（全体）」をはっきりさせます。ここでは全体の40人が「もとにする量」で、1（100％）にあたります。比べる量 ＝ もとにする量 × 割合 なので、40 × 0.3 ＝ 12人 です。「量が変われば割合も変わる」のではなく、割合は全体との比です。',
+      a: '40 × 0.3 ＝ <span class="ans">12</span>（人）' },
+    guided: uniqGen(() => genWariaiItem(true), i => i.key, half),
+    plain: uniqGen(() => genWariaiItem(false), i => i.key, count - half) };
+}
+/* --- 百分率⇔倍・小数 --- */
+function genPercentItem(guided){
+  const kind = rnd(0, 3);
+  const line = guided ? '<div>' + numLineSVG(0, 1, 0.25, []) + '</div><div class="scaffold">100％ ＝ 1（倍）、10％ ＝ 0.1。％を ÷100 すると 小数・倍に なります</div>' : '';
+  if(kind === 0){ const pc = [5, 15, 30, 45, 60, 75, 90, 120][rnd(0, 7)];
+    return { q: pc + '％ を 小数で 表すと ' + B() + ' です' + line, a: '<span class="ans">' + (pc / 100) + '</span>', key: 'p' + pc }; }
+  if(kind === 1){ const d = [0.05, 0.2, 0.35, 0.5, 0.65, 0.8, 1.1, 1.25][rnd(0, 7)];
+    return { q: d + ' を 百分率で 表すと ' + B() + '％ です' + line, a: '<span class="ans">' + Math.round(d * 100) + '</span>％', key: 'pd' + d }; }
+  if(kind === 2){ const up = [10, 20, 25, 50][rnd(0, 3)];
+    return { q: 'もとの量の「' + up + '％ 増し」は、もとの量の ' + B() + ' 倍です' + line, a: '<span class="ans">' + (1 + up / 100) + '</span> 倍', key: 'pu' + up }; }
+  const off = [10, 20, 30, 50][rnd(0, 3)];
+  return { q: 'もとの量の「' + off + '％ 引き」は、もとの量の ' + B() + ' 倍です' + line, a: '<span class="ans">' + (1 - off / 100) + '</span> 倍', key: 'po' + off };
+}
+function genPercent(count){
+  const half = Math.ceil(count / 2);
+  return { goal: '百分率・小数・倍は 同じ割合の ちがう表し方。自由に 行き来しよう',
+    example: { q: '「10％増量」とは、もとの量の何倍でしょう。', visual: numLineSVG(0, 1, 0.25, [{ v: 1, label: 'もとの量' }]),
+      think: 'もとの量を 1（＝100％）と見ます。10％増えるので、割合は 100％ ＋ 10％ ＝ 110％。110％ を小数に直すと 1.1。つまり「10％増量 ＝ 1.1倍」です。増えた分だけを数えるのではなく、全体が何倍になったかで考えます。',
+      a: '<span class="ans">1.1</span> 倍' },
+    guided: uniqGen(() => genPercentItem(true), i => i.key, half),
+    plain: uniqGen(() => genPercentItem(false), i => i.key, count - half) };
+}
+/* --- 単位分数で見る（通分の意味・数直線） --- */
+function subBarSVG(d, n, k){
+  const w = 252, cell = w / d, sub = cell / k;
+  let s = '<svg width="' + w + '" height="38" viewBox="0 0 ' + w + ' 38" role="img" aria-label="分けたテープ図">';
+  for(let i = 0; i < d; i++) for(let j = 0; j < k; j++)
+    s += '<rect x="' + (i * cell + j * sub) + '" y="2" width="' + sub + '" height="26" fill="' + (i < n ? '#9cc79c' : '#fff') + '" stroke="#446" stroke-width="1"/>';
+  for(let i = 0; i <= d; i++) s += '<line x1="' + (i * cell) + '" y1="0" x2="' + (i * cell) + '" y2="30" stroke="#335" stroke-width="2"/>';
+  return s + '</svg>';
+}
+function genTanibunsuItem(guided){
+  if(Math.random() < 0.55){
+    const [d, n, k] = [[2, 1, 3], [3, 2, 2], [4, 3, 2], [3, 1, 4], [4, 1, 3], [5, 2, 2], [6, 5, 2], [2, 1, 4]][rnd(0, 7)];
+    const unit = d * k, cnt = n * k;
+    const scaf = guided ? '<div>' + subBarSVG(d, n, k) + '</div><div class="scaffold">1つ分を さらに ' + k + 'つに 分けると、全体は ' + unit + 'つに 分かれます</div>' : '';
+    return { q: FR(n, d) + ' は ' + FR(1, unit) + ' の ' + B() + ' 個分です' + scaf,
+      a: '<span class="ans">' + cnt + '</span> 個分', key: 't' + d + '/' + n + 'x' + k };
+  }
+  const [d, m] = [[3, 5], [4, 7], [6, 5], [3, 4], [6, 11], [4, 5], [8, 11], [6, 7]][rnd(0, 7)];
+  const scaf = guided ? '<div>' + fracLineSVG(d) + '</div><div class="scaffold">0から2までを ' + d + 'つずつに 分けた 目盛り。1目盛りは ' + FR(1, d) + ' です</div>' : '';
+  return { q: '0から2までを ' + d + '等分した数直線で、左から ' + m + ' 目盛り目の数は ' + B() + ' です' + scaf,
+    a: '<span class="ans">' + FR(m, d) + '</span>', key: 'tl' + d + '/' + m };
+}
+function genTanibunsu(count){
+  const half = Math.ceil(count / 2);
+  return { goal: '分数は「単位分数の いくつ分」。通分は 単位を そろえること',
+    example: { q: FR(1, 2) + ' ＋ ' + FR(1, 3) + ' が そのまま 足せないのは なぜでしょう。', visual: subBarSVG(6, 5, 1),
+      think: '1/2 と 1/3 は「1つ分の大きさ（単位分数）」が ちがいます。単位をそろえるために、両方を 1/6 の いくつ分で 表し直します。1/2 ＝ 1/6 が 3個分、1/3 ＝ 1/6 が 2個分。だから 1/2＋1/3 ＝ 1/6 が 5個分 ＝ 5/6 です。これが通分の意味です。',
+      a: FR(1, 2) + '＋' + FR(1, 3) + ' ＝ <span class="ans">' + FR(5, 6) + '</span>' },
+    guided: uniqGen(() => genTanibunsuItem(true), i => i.key, half),
+    plain: uniqGen(() => genTanibunsuItem(false), i => i.key, count - half) };
+}
+/* --- 速さ（単位量あたり） --- */
+function genHayasaItem(guided){
+  if(Math.random() < 0.6){
+    const sp = [40, 50, 60, 75, 80, 90, 100, 120, 150, 200, 240, 300][rnd(0, 11)];
+    const t = [2, 3, 4, 5, 6, 8, 10][rnd(0, 6)];
+    const dist = sp * t;
+    const scaf = guided ? '<div class="scaffold">分速 ＝ 道のり ÷ 時間（' + dist + ' ÷ ' + t + '）… 1分あたりの 道のりです</div>' : '';
+    return { q: dist + ' m を ' + t + ' 分で 進みました。分速は ' + B() + ' m です' + scaf,
+      a: dist + ' ÷ ' + t + ' ＝ <span class="ans">分速 ' + sp + ' m</span>', key: 'h' + dist + '/' + t };
+  }
+  const mk = () => { const sp = [50, 60, 80, 100, 120, 150][rnd(0, 5)]; const t = [3, 4, 5, 6][rnd(0, 3)]; return { sp, t, d: sp * t }; };
+  let A = mk(), Bp = mk(); if(A.sp === Bp.sp) Bp.sp += 20, Bp.d = Bp.sp * Bp.t;
+  const fast = A.sp > Bp.sp ? 'A' : 'B';
+  const scaf = guided ? '<div class="scaffold">それぞれ 分速（道のり ÷ 時間）を 出して 比べます。速さは 足し算では 比べられません</div>' : '';
+  return { q: 'A： ' + A.d + ' m を ' + A.t + ' 分、B： ' + Bp.d + ' m を ' + Bp.t + ' 分。速いのは ' + B() + ' です' + scaf,
+    a: 'A は分速 ' + A.sp + ' m、B は分速 ' + Bp.sp + ' m → <span class="ans">' + fast + '</span>', key: 'hc' + A.d + '/' + Bp.d };
+}
+function genHayasa(count){
+  const half = Math.ceil(count / 2);
+  return { goal: '速さは「1分あたり」の 量に 直して 比べる・求める',
+    example: { q: '600 m を 3分で進む人と、800 m を 5分で進む人。どちらが速いでしょう。', visual: '',
+      think: '道のりも時間もちがうので、そのままでは比べられません。「1分あたりの道のり（分速）」にそろえます。600 ÷ 3 ＝ 分速200 m、800 ÷ 5 ＝ 分速160 m。だから 600 m を 3分の人の方が速いです。速さは「足す」のではなく「単位量あたりに直す」ものです。',
+      a: '<span class="ans">600 m を 3分で進む人</span>（分速200 m ＞ 分速160 m）' },
+    guided: uniqGen(() => genHayasaItem(true), i => i.key, half),
+    plain: uniqGen(() => genHayasaItem(false), i => i.key, count - half) };
+}
+/* --- 体積（1cm³の何個分） --- */
+function layerSVG(a, b){
+  const cell = Math.min(30, 88 / b), w = a * cell, h = b * cell;
+  let s = '<svg width="' + w + '" height="' + (h + 4) + '" viewBox="0 0 ' + w + ' ' + (h + 4) + '" role="img" aria-label="単位立方体の並び">';
+  for(let i = 0; i < a; i++) for(let j = 0; j < b; j++)
+    s += '<rect x="' + (i * cell) + '" y="' + (2 + j * cell) + '" width="' + cell + '" height="' + cell + '" fill="' + ((i + j) % 2 ? '#cfe6cf' : '#a9d3a9') + '" stroke="#446" stroke-width="1.2"/>';
+  return s + '</svg>';
+}
+function genTaisekiItem(guided){
+  const a = rnd(2, 6), b = rnd(2, 5), c = rnd(2, 5);
+  const scaf = guided ? '<div>' + layerSVG(a, b) + '</div><div class="scaffold">1段に ' + a + '×' + b + '＝' + (a * b) + ' 個、それが ' + c + ' 段 → 全部で 何個？</div>' : '';
+  return { q: 'たて ' + a + ' cm、横 ' + b + ' cm、高さ ' + c + ' cm の 直方体の 体積は ' + B() + ' cm³ です' + scaf,
+    a: a + '×' + b + '×' + c + ' ＝ <span class="ans">' + (a * b * c) + ' cm³</span>', key: 'v' + a + 'x' + b + 'x' + c };
+}
+function genTaiseki(count){
+  const half = Math.ceil(count / 2);
+  return { goal: '体積は「1 cm³ が 何個分」。公式は 個数を 数える 式だと 確かめよう',
+    example: { q: 'たて 3 cm、横 2 cm、高さ 4 cm の直方体の体積を考えます。', visual: layerSVG(3, 2),
+      think: '1 cm³ の立方体で考えます。底面には 3×2 ＝ 6個 並び、それが 4段 積み上がるので、全部で 6×4 ＝ 24個。だから体積は 24 cm³ です。「たて×横×高さ」は、この個数を数える式です。面積の公式（たて×横）や円周率を混ぜないことが大切です。',
+      a: '3 × 2 × 4 ＝ <span class="ans">24 cm³</span>' },
+    guided: uniqGen(() => genTaisekiItem(true), i => i.key, half),
+    plain: uniqGen(() => genTaisekiItem(false), i => i.key, count - half) };
+}
+/* --- 周の長さと面積の区別 --- */
+function genShuumenItem(guided){
+  const w = rnd(3, 12), h = rnd(2, 9);
+  const scaf = guided ? '<div class="scaffold">周の長さ ＝ まわりを 1周した 長さ（たて＋横）×2、面積 ＝ 中身（たて×横）</div>' : '';
+  return { q: 'たて ' + h + ' cm、横 ' + w + ' cm の 長方形。周の長さは ' + B() + ' cm、面積は ' + B() + ' cm² です' + scaf,
+    a: '周： <span class="ans">' + (2 * (w + h)) + ' cm</span>、面積： <span class="ans">' + (w * h) + ' cm²</span>', key: 'sm' + w + 'x' + h };
+}
+function genShuumen(count){
+  const half = Math.ceil(count / 2);
+  return { goal: '「まわり（周）」と「中身（面積）」を 言葉で 区別してから 式を 立てよう',
+    example: { q: 'たて 3 cm、横 5 cm の長方形で、周と面積を比べます。', visual: '',
+      think: '周の長さは「まわりを1周する長さ」なので、（3 ＋ 5）× 2 ＝ 16 cm。面積は「中身の広さ」で、3 × 5 ＝ 15 cm²。単位も cm と cm² でちがいます。式を立てる前に「まわり？ 中身？」と声に出すと、混同が減ります。',
+      a: '周： <span class="ans">16 cm</span>、面積： <span class="ans">15 cm²</span>' },
+    guided: uniqGen(() => genShuumenItem(true), i => i.key, half),
+    plain: uniqGen(() => genShuumenItem(false), i => i.key, count - half) };
+}
+/* --- 小数のわり算：意味と見積もり --- */
+function genWarizanImiItem(guided){
+  const bs = [0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 0.9, 1.2, 1.5, 2.4];
+  const b = bs[rnd(0, bs.length - 1)]; const q = rnd(3, 12); const a = Math.round(b * q * 100) / 100;
+  const big = b < 1;
+  const scaf = guided ? '<div class="scaffold">わる数 ' + b + ' は 1 より ' + (big ? '小さい → 商は ' + a + ' より 大きく なります' : '大きい → 商は ' + a + ' より 小さく なります') + '。まず 見当を つけてから 計算します</div>' : '';
+  return { q: a + ' ÷ ' + b + ' ＝ ' + B() + ' です' + scaf,
+    a: '<span class="ans">' + q + '</span>', key: 'wi' + a + '/' + b };
+}
+function genWarizanImi(count){
+  const half = Math.ceil(count / 2);
+  return { goal: 'わる数が 1より 小さいと 商は 大きくなる。まず 見当、つぎに 計算',
+    example: { q: '2.4 ÷ 0.6 を考えます。「ジュース 2.4 L を、0.6 L ずつ分けると何人分？」', visual: numLineSVG(0, 2.4, 0.6, [{ v: 2.4, label: '2.4 L' }]),
+      think: '「大きい数 ÷ 小さい数」と機械的に考えるのではなく、場面で考えます。0.6 L ずつ分けていくと、数直線では 0.6、1.2、1.8、2.4 と 4回分。だから 2.4 ÷ 0.6 ＝ 4 です。わる数が 1 より小さいと、商は わられる数（2.4）より大きくなります。',
+      a: '2.4 ÷ 0.6 ＝ <span class="ans">4</span>（人分）' },
+    guided: uniqGen(() => genWarizanImiItem(true), i => i.key, half),
+    plain: uniqGen(() => genWarizanImiItem(false), i => i.key, count - half) };
+}
+/* --- 小数のわり算：筆算の型（両方を10倍） --- */
+function genWarizanHissanItem(guided){
+  const b10 = [12, 15, 16, 18, 24, 25, 32, 36, 45, 48][rnd(0, 9)];
+  const b = b10 / 10; const q = rnd(3, 9); const a = Math.round(b * q * 100) / 100; const a10 = Math.round(a * 10 * 100) / 100;
+  const scaf = guided ? '<div class="scaffold">わる数を 整数に するために 10倍すると ' + b10 + '。わられる数も 同じく 10倍して ' + a10 + ' に します → ' + a10 + ' ÷ ' + b10 + '</div>' : '';
+  return { q: a + ' ÷ ' + b + ' ＝ ' + B() + ' です' + scaf,
+    a: a10 + ' ÷ ' + b10 + ' ＝ <span class="ans">' + q + '</span>', key: 'wh' + a + '/' + b };
+}
+function genWarizanHissan(count){
+  const half = Math.ceil(count / 2);
+  return { goal: '小数で わるときは、わる数と わられる数を 同じだけ 大きくしてから 計算',
+    example: { q: '4.8 ÷ 1.2 を考えます。', visual: '',
+      think: 'わる数 1.2 を整数にしたいので 10倍して 12 にします。このとき、わられる数 4.8 も同じく 10倍して 48 にしなければ、商が変わってしまいます。48 ÷ 12 ＝ 4。「片方だけ10倍」が典型的な間違いです。',
+      a: '4.8 ÷ 1.2 ＝ <span class="ans">4</span>' },
+    guided: uniqGen(() => genWarizanHissanItem(true), i => i.key, half),
+    plain: uniqGen(() => genWarizanHissanItem(false), i => i.key, count - half) };
+}
+
+/* ===== 追加分（2026-11-15 v2.0）：中学校の6ケース・7原因 ===== */
+function miniTableSVG(rows){
+let s = '<table style="border-collapse:collapse; margin:4px 0; font-size:.95em">';
+rows.forEach((r, i) => { s += '<tr>' + r.map(c => '<' + (i === 0? 'th': 'td') + ' style="border:1.6px solid #557; padding:2px 12px; text-align:center;' + (i === 0? ' background:#eef6ee;': '') + '">' + c + '</' + (i === 0? 'th': 'td') + '>').join('') + '</tr>';});
+return s + '</table>';
+}
+/* --- 一次関数：変化の割合 --- */
+function genHenkaItem(guided){
+const a = [2, 3, 4, 5, -2, -3][rnd(0, 5)]; const b = rnd(-4, 6); const x0 = rnd(0, 3);
+const y = x => a * x + b;
+const tbl = miniTableSVG([[V('x'), x0, x0 + 1, x0 + 2, x0 + 3], [V('y'), y(x0), y(x0 + 1), y(x0 + 2), y(x0 + 3)]]);
+const scaf = guided? '<div class="scaffold">' + V('x') + ' が 1 増えると ' + V('y') + ' は ' + a + ' 増えます。' + V('x') + ' が 3 増えると ' + V('y') + ' の増加量は その 3倍です</div>': '';
+return { q: V('y') + ' ＝ ' + a + V('x') + (b >= 0? ' ＋ ' + b: ' − ' + (-b)) + ' の表です。' + tbl
++ V('x') + ' の増加量が 3 のとき、' + V('y') + ' の増加量は ' + B() + '、変化の割合は ' + B() + ' です' + scaf,
+a: V('y') + ' の増加量 <span class="ans">' + (3 * a) + '</span>、変化の割合 <span class="ans">' + a + '</span>', key: 'hk' + a + '/' + b + '/' + x0};
+}
+function genHenka(count){
+const half = Math.ceil(count / 2);
+return { goal: '変化の割合は「yの増加量 ÷ xの増加量」。隣どうしの差だけでは決まらない',
+example: { q: V('y') + ' ＝ 2' + V('x') + ' ＋ 1 で、' + V('x') + ' が 2 から 5 まで増えたときを考えます。', visual: '',
+think: 'x の増加量は 5 − 2 ＝ 3。y は 5 から 11 へ増えるので、y の増加量は 6。変化の割合 ＝ yの増加量 ÷ xの増加量 ＝ 6 ÷ 3 ＝ 2 です。「隣合う y の差が 2」なのは、x が 1 増えた場合に限ります。x の増加量が 3 なら、y の増加量は 2×3 ＝ 6 になります。',
+a: '変化の割合 ＝ <span class="ans">2</span>'},
+guided: uniqGen(() => genHenkaItem(true), i => i.key, half),
+plain: uniqGen(() => genHenkaItem(false), i => i.key, count - half)};
+}
+/* --- 図形の証明：構想（逆向き設計） --- */
+function triSVG(labels){
+return '<svg width="190" height="118" viewBox="0 0 190 118" role="img" aria-label="二等辺三角形の図">'
++ '<polygon points="95,10 25,100 165,100" fill="#eef6ee" stroke="#446" stroke-width="2"/>'
++ '<line x1="95" y1="10" x2="95" y2="100" stroke="#c8433c" stroke-width="2"/>'
++ '<circle cx="95" cy="100" r="3.4" fill="#c8433c"/>'
++ '<text x="95" y="8" text-anchor="middle" font-size="13" font-weight="700">A</text>'
++ '<text x="16" y="112" font-size="13" font-weight="700">B</text>'
++ '<text x="168" y="112" font-size="13" font-weight="700">C</text>'
++ '<text x="103" y="96" font-size="12.5" font-weight="700" fill="#c8433c">D</text></svg>';
+}
+const SHOMEI_TEMPLATES = [
+{ cond: 'AB ＝ AC、D は BC の中点', flow: ['AB ＝ AC', 'BD ＝ CD', 'AD ＝ AD（共通）', '3組の辺がそれぞれ等しい'],
+q: '△ABD ≡ △ACD を示します。BD ＝ CD は「D が BC の（　）だから」、AD ＝ AD は「（　）な辺だから」です。合同条件は「（　）」です。',
+a: '中点、共通、<span class="ans">3組の辺がそれぞれ等しい</span>',
+think: '結論（合同）から逆にたどり、「どの3組が等しければよいか」を先に決めます。BD ＝ CD は中点の条件から、AD は2つの三角形に共通な辺です。結論そのものを根拠に使わないことが大切です。'},
+{ cond: 'AB ＝ AC、∠BAD ＝ ∠CAD（AD は角の二等分線）', flow: ['AB ＝ AC', '∠BAD ＝ ∠CAD', 'AD ＝ AD（共通）', '2組の辺とその間の角がそれぞれ等しい'],
+q: '△ABD ≡ △ACD を示します。∠BAD ＝ ∠CAD は「AD が角の（　）だから」、合同条件は「（　）」です。',
+a: '二等分線、<span class="ans">2組の辺とその間の角がそれぞれ等しい</span>',
+think: '「間の角」であることがポイントです。等しい辺2組と、はさまれた角1組がそろえば合同が言えます。条件を1つずつ、仮定のどこから来るのか対応づけます。'},
+{ cond: 'AD ∥ BC（平行線）、AB ＝ AC', flow: ['∠DAB ＝ ∠B（錯角）', '∠DAC ＝ ∠C（錯角）', '∠B ＝ ∠C（底角）', 'AD は ∠A の二等分線'],
+q: 'AD ∥ BC のとき、AD が ∠BAC の二等分線になることを示します。平行線の（　）で ∠DAB ＝ ∠B、∠DAC ＝ ∠C。二等辺三角形の（　）が等しいので、∠DAB ＝ ∠DAC が言えます。',
+a: '錯角、<span class="ans">底角</span>',
+think: '結論（AD が二等分線）には ∠DAB ＝ ∠DAC が必要です。その橋渡しに、平行線の錯角と二等辺三角形の底角を使います。「結論 ← 使える性質」を逆向きに組み立てるのが構想です。'},
+];
+function genShomeiItem(guided){
+const t = SHOMEI_TEMPLATES[rnd(0, SHOMEI_TEMPLATES.length - 1)];
+const scaf = guided? '<div class="scaffold">流れ： ' + t.flow.join(' → ') + '</div>': '';
+return { q: '' + t.cond + '<br>' + t.q + scaf, a: t.a, key: 'sh' + SHOMEI_TEMPLATES.indexOf(t) + '/' + rnd(0, 99999)};
+}
+function genShomei(count){
+const half = Math.ceil(count / 2);
+const t = SHOMEI_TEMPLATES[0];
+return { goal: '証明は「結論から逆向き」に組み立てる。根拠の出どころを1つずつ確かめよう',
+example: { q: '' + t.cond, visual: triSVG(),
+think: t.think, a: '△ABD ≡ △ACD（' + t.flow[3] + '）'},
+guided: uniqGen(() => genShomeiItem(true), i => i.key, half),
+plain: uniqGen(() => genShomeiItem(false), i => i.key, count - half)};
+}
+/* --- 一次方程式：立式 --- */
+function genRitsushikiItem(guided){
+const kind = rnd(0, 2);
+if(kind === 0){
+const price = [40, 50, 60, 80, 100][rnd(0, 4)]; const n = rnd(3, 7); const extra = [100, 120, 150, 200][rnd(0, 3)];
+const total = price * n + extra; const x = price;
+const scaf = guided? '<div class="scaffold">等しい関係： 鉛筆の代金 ＋ ノートの代金 ＝ 合計。鉛筆の代金は「1本の値段 × 本数」で表します</div>': '';
+return { q: '1本 ' + V('x') + ' 円の鉛筆を ' + n + ' 本と、' + extra + ' 円のノートを買うと、合計 ' + total + ' 円でした。方程式は ' + B() + V('x') + ' ＋ ' + extra + ' ＝ ' + total + ' で、' + V('x') + ' ＝ ' + B() + ' です' + scaf,
+a: '係数 <span class="ans">' + n + '</span>、' + V('x') + ' ＝ <span class="ans">' + x + '</span>', key: 'rs' + n + '/' + extra + '/' + total};
+}
+if(kind === 1){
+const per = rnd(3, 6); const left = rnd(2, 9); const people = rnd(8, 15); const total = per * people + left;
+const scaf = guided? '<div class="scaffold">あめの個数を2通りに表します： 「1人に ' + per + ' 個ずつ × 人数 ＋ 余り」と「合計 ' + total + ' 個」が等しいです</div>': '';
+return { q: 'あめを1人に ' + per + ' 個ずつ配ると ' + left + ' 個余ります。あめは全部で ' + total + ' 個です。人数を ' + V('x') + ' 人として方程式を立てると ' + per + V('x') + ' ＋ ' + B() + ' ＝ ' + total + ' で、' + V('x') + ' ＝ ' + B() + ' です' + scaf,
+a: '余り <span class="ans">' + left + '</span>、' + V('x') + ' ＝ <span class="ans">' + people + '</span>', key: 'rs2' + per + '/' + total};
+}
+const len = [120, 150, 180, 200, 240][rnd(0, 4)]; const cut = rnd(3, 8); const rest = len - cut * 10;
+const scaf = guided? '<div class="scaffold">リボンの長さを2通りに表します： 「切り取った分 ＋ 残り」と「全体」が等しいです</div>': '';
+return { q: len + ' cm のリボンから、' + V('x') + ' cm ずつ ' + cut + ' 本切り取ると、残りは ' + rest + ' cm でした。方程式は ' + cut + V('x') + ' ＋ ' + rest + ' ＝ ' + B() + ' で、' + V('x') + ' ＝ ' + B() + ' です' + scaf,
+a: '全体 <span class="ans">' + len + '</span>、' + V('x') + ' ＝ <span class="ans">10</span>', key: 'rs3' + len + '/' + cut};
+}
+function genRitsushiki(count){
+const half = Math.ceil(count / 2);
+return { goal: '立式のコツは「等しい数量を2通りに表す」こと。表に整理してから式にしよう',
+example: { q: '1本 60 円の鉛筆を5本と、120 円のノートを買って、合計 420 円でした。鉛筆の本数を確かめる式を考えます。', visual: '',
+think: '数量を整理します。鉛筆の代金は 60×5 ＝ 300 円、ノートは 120 円、合計 420 円。「鉛筆の代金 ＋ ノートの代金 ＝ 合計」という等しい関係が見えれば、知りたい量を x と置いて 60x ＋ 120 ＝ 540 のように、他の問題でも同じ型で立てられます。解く計算より先に、この「等しいものの置き換え」が立式の核心です。',
+a: '60 × 5 ＋ 120 ＝ <span class="ans">420</span>（円）'},
+guided: uniqGen(() => genRitsushikiItem(true), i => i.key, half),
+plain: uniqGen(() => genRitsushikiItem(false), i => i.key, count - half)};
+}
+/* --- 等式変形 --- */
+function genToshikiItem(guided){
+const kind = rnd(0, 2);
+if(kind === 0){
+const a = rnd(2, 6), b = rnd(3, 12);
+const scaf = guided? '<div class="scaffold">両辺から ' + a + V('x') + ' を引きます（天秤の両側から同じ重さを取るイメージ）</div>': '';
+return { q: a + V('x') + ' ＋ ' + V('y') + ' ＝ ' + b + ' を ' + V('y') + ' について解くと、' + V('y') + ' ＝ ' + b + ' − ' + B() + ' です' + scaf,
+a: V('y') + ' ＝ ' + b + ' − <span class="ans">' + a + V('x') + '</span>', key: 'ts' + a + '/' + b};
+}
+if(kind === 1){
+const a = rnd(2, 9), b = rnd(2, 12);
+const scaf = guided? '<div class="scaffold">両辺に ' + a + ' を足します。移項すると符号が変わるのは、この操作の結果です</div>': '';
+return { q: V('x') + ' − ' + a + ' ＝ ' + b + ' の両辺に ' + a + ' を足すと、' + V('x') + ' ＝ ' + B() + ' です' + scaf,
+a: V('x') + ' ＝ <span class="ans">' + (a + b) + '</span>', key: 'ts2' + a + '/' + b};
+}
+const a = rnd(2, 6), b = rnd(1, 9);
+const scaf = guided? '<div class="scaffold">' + V('y') + ' を左辺に残すため、両辺に ' + V('y') + ' を足してから、両辺から ' + a + ' を引きます</div>': '';
+return { q: V('x') + ' − ' + V('y') + ' ＝ ' + a + ' を ' + V('y') + ' について解くと、' + V('y') + ' ＝ ' + V('x') + ' − ' + B() + ' です' + scaf,
+a: V('y') + ' ＝ ' + V('x') + ' − <span class="ans">' + a + '</span>', key: 'ts3' + a};
+}
+function genToshiki(count){
+const half = Math.ceil(count / 2);
+return { goal: '等式変形は「両辺に同じ操作」。移項の符号変化は、その結果だと理解しよう',
+example: { q: '2' + V('x') + ' ＋ ' + V('y') + ' ＝ 7 を ' + V('y') + ' について解きます。', visual: '',
+think: 'y を左辺に1つだけ残したいので、両辺から 2x を引きます。2x ＋ y − 2x ＝ 7 − 2x となり、y ＝ 7 − 2x です。「移項すると符号が変わる」のは暗記ではなく、両辺に同じ数を引く（足す）操作の結果として理解すると、符号ミスが減ります。',
+a: V('y') + ' ＝ <span class="ans">7 − 2' + V('x') + '</span>'},
+guided: uniqGen(() => genToshikiItem(true), i => i.key, half),
+plain: uniqGen(() => genToshikiItem(false), i => i.key, count - half)};
+}
+/* --- 文字式で表す --- */
+function genMojiItem(guided){
+const kind = rnd(0, 3);
+if(kind === 0){
+const scaf = guided? '<div class="scaffold">偶数は 2, 4, 6, … と 2 ずつ増えます。' + V('n') + ' の次の偶数は ' + V('n') + ' ＋ 2 です</div>': '';
+return { q: V('n') + ' を偶数とすると、次に大きい偶数は ' + B() + '、その次は ' + B() + ' です' + scaf,
+a: '<span class="ans">' + V('n') + ' ＋ 2</span>、<span class="ans">' + V('n') + ' ＋ 4</span>', key: 'mj0/' + rnd(0, 9999)};
+}
+if(kind === 1){
+const a = [100, 120, 150, 200][rnd(0, 3)], n = rnd(2, 8), b = [80, 90, 110][rnd(0, 2)], m = rnd(2, 6);
+const scaf = guided? '<div class="scaffold">代金 ＝ 単価 × 個数。文字の部分はそのまま残します</div>': '';
+return { q: '1個 ' + a + ' 円のりんご ' + V('x') + ' 個と、1個 ' + b + ' 円のみかん ' + V('y') + ' 個の代金は ' + B() + ' 円です' + scaf,
+a: '<span class="ans">' + a + V('x') + ' ＋ ' + b + V('y') + '</span> 円', key: 'mj1/' + a + '/' + b};
+}
+if(kind === 2){
+const sp = [3, 4, 5, 60, 80][rnd(0, 4)];
+const scaf = guided? '<div class="scaffold">道のり ＝ 速さ × 時間。数字と文字の積は、数字を前に書きます</div>': '';
+return { q: '時速 ' + sp + ' km で ' + V('x') + ' 時間歩いた道のりは ' + B() + ' kmです' + scaf,
+a: '<span class="ans">' + sp + V('x') + '</span> km', key: 'mj2/' + sp};
+}
+const scaf = guided? '<div class="scaffold">真ん中の数を ' + V('n') + ' とすると、両隣は ' + V('n') + ' − 1 と ' + V('n') + ' ＋ 1。和は ' + V('n') + ' が 3つ分になります</div>': '';
+return { q: '連続する3つの整数の真ん中を ' + V('n') + ' とすると、3つの整数の和は ' + B() + ' です' + scaf,
+a: '<span class="ans">3' + V('n') + '</span>', key: 'mj3/' + rnd(0, 9999)};
+}
+function genMoji(count){
+const half = Math.ceil(count / 2);
+return { goal: '文字は「数の代表」。具体的な数で試してから、文字に置き換えよう',
+example: { q: '偶数 ' + V('n') + ' の次に大きい偶数を、式で表します。', visual: '',
+think: 'まず具体例で確かめます。偶数が 6 なら次は 8 で、6 ＋ 2。偶数が 10 なら次は 12 で、10 ＋ 2。いつも「＋2」なので、n の次は n ＋ 2 と表せます。文字は「どんな数でも当てはまる代表」です。',
+a: '<span class="ans">' + V('n') + ' ＋ 2</span>'},
+guided: uniqGen(() => genMojiItem(true), i => i.key, half),
+plain: uniqGen(() => genMojiItem(false), i => i.key, count - half)};
+}
+/* --- 平方根の意味 --- */
+function genHeihokonItem(guided){
+const kind = rnd(0, 2);
+if(kind === 0){
+const pairs = [[7, 3], [15, 4], [10, 3], [20, 4], [5, 2], [30, 5], [12, 3], [50, 7], [8, 3], [24, 5]];
+const [a, n] = pairs[rnd(0, pairs.length - 1)];
+const small = a < n * n;
+const scaf = guided? '<div class="scaffold">2乗して比べます： （' + RAD(a) + '）² ＝ ' + a + '、' + n + '² ＝ ' + (n * n) + '</div>': '';
+return { q: RAD(a) + ' と ' + n + '、大きいのは ' + B() + ' です' + scaf,
+a: '<span class="ans">' + (small? n: RAD(a)) + '</span>', key: 'hh' + a + '/' + n};
+}
+if(kind === 1){
+const a = [5, 7, 10, 12, 15, 20, 30, 40][rnd(0, 7)];
+const lo = Math.floor(Math.sqrt(a));
+const scaf = guided? '<div class="scaffold">' + lo + '² ＝ ' + (lo * lo) + '、' + (lo + 1) + '² ＝ ' + ((lo + 1) * (lo + 1)) + '。' + a + ' は この2つの 間に あります</div>': '';
+return { q: RAD(a) + ' は、' + B() + ' と ' + B() + ' の間にあります（連続する整数）' + scaf,
+a: '<span class="ans">' + lo + '</span> と <span class="ans">' + (lo + 1) + '</span>', key: 'hh2' + a};
+}
+const sq = [[36, 6], [49, 7], [81, 9], [121, 11], [0.25, 0.5], [1.44, 1.2], [100, 10], [64, 8]][rnd(0, 7)];
+const scaf = guided? '<div class="scaffold">' + sq[1] + ' を 2乗すると ' + sq[0] + ' になります</div>': '';
+return { q: RAD(sq[0]) + ' ＝ ' + B() + ' です' + scaf,
+a: '<span class="ans">' + sq[1] + '</span>', key: 'hh3' + sq[0]};
+}
+function genHeihokon(count){
+const half = Math.ceil(count / 2);
+return { goal: '√a は「2乗すると a になる正の数」。大きさは 2乗して比べよう',
+example: { q: RAD(10) + ' の大きさを考えます。', visual: numLineSVG(0, 5, 1, [{ v: 3.16, label: '√10'}]),
+think: '√10 は「2乗すると 10 になる数」です。3² ＝ 9、4² ＝ 16 なので、√10 は 3 と 4 の間にあります。もう少し絞ると 3.1² ＝ 9.61、3.2² ＝ 10.24 なので、√10 ≒ 3.16 です。計算（有理化など）の前に、この「大きさの見当」が意味理解の土台になります。',
+a: RAD(10) + ' は <span class="ans">3 と 4 の間</span>（≒ 3.16）'},
+guided: uniqGen(() => genHeihokonItem(true), i => i.key, half),
+plain: uniqGen(() => genHeihokonItem(false), i => i.key, count - half)};
+}
+/* --- 正負の数：概念（絶対値と大小・分類） --- */
+function genSeifuItem(guided){
+const kind = rnd(0, 2);
+if(kind === 0){
+const a = [3, 5, 7, 2.5, 0.5, 12][rnd(0, 5)];
+const scaf = guided? '<div>' + numLineSVG(-6, 6, 2, [{ v: -a, label: '−' + a}]) + '</div><div class="scaffold">絶対値は、数直線で 0 からの距離です</div>': '';
+return { q: '−' + a + ' の絶対値は ' + B() + ' です' + scaf, a: '<span class="ans">' + a + '</span>', key: 'sf' + a};
+}
+if(kind === 1){
+const pairs = [[-4, -1], [-0.5, -2], [-7, -3], [-1, -5], [-9, -2], [-0.2, -1]];
+const [a, b] = pairs[rnd(0, pairs.length - 1)];
+const big = Math.max(a, b);
+const scaf = guided? '<div class="scaffold">負の数どうしでは、絶対値が小さい（0に近い）方が大きい数です</div>': '';
+return { q: a + ' と ' + b + '、大きいのは ' + B() + ' です' + scaf, a: '<span class="ans">' + big + '</span>', key: 'sf2' + a + '/' + b};
+}
+const scaf = guided? '<div class="scaffold">自然数は「1, 2, 3, …」と 数を数えるときの 数。0 や 小数・分数は 入りません</div>': '';
+return { q: '−3、0、5、2.5 のうち、自然数は ' + B() + ' です' + scaf, a: '<span class="ans">5</span>', key: 'sf3/' + rnd(0, 9999)};
+}
+function genSeifu(count){
+const half = Math.ceil(count / 2);
+return { goal: '絶対値は「0からの距離」、自然数は「数える数」。言葉の意味から確かめよう',
+example: { q: '−4 の絶対値と、自然数の範囲を確かめます。', visual: numLineSVG(-6, 6, 2, [{ v: -4, label: '−4'}]),
+think: '絶対値は、数直線の上で 0 からどれだけ離れているか（距離）です。−4 は 0 から 4 離れているので、絶対値は 4 です。また自然数は「1, 2, 3, …」と物を数えるときに使う数で、0 は入りません。計算ができるのに、この言葉の意味でつまずく生徒は少なくありません。',
+a: '絶対値 <span class="ans">4</span>、自然数に 0 は <span class="ans">入らない</span>'},
+guided: uniqGen(() => genSeifuItem(true), i => i.key, half),
+plain: uniqGen(() => genSeifuItem(false), i => i.key, count - half)};
+}
+
+const GENERATORS = { 'cause-ku': genKu, 'cause-sub': genSub, 'cause-sakura': genSakura, 'cause-kuku': genKuku, 'cause-frac': genFrac, 'cause-lcm': genLcm,
+  'cause-wariai': genWariai, 'cause-percent': genPercent, 'cause-tanibunsu': genTanibunsu, 'cause-hayasa': genHayasa,
+  'cause-taiseki': genTaiseki, 'cause-shuumen': genShuumen, 'cause-warizan-imi': genWarizanImi, 'cause-warizan-hissan': genWarizanHissan,
+  'cause-henka': genHenka, 'cause-shomei': genShomei, 'cause-ritsushiki': genRitsushiki, 'cause-toshiki': genToshiki,
+  'cause-moji': genMoji, 'cause-heihokon': genHeihokon, 'cause-seifu': genSeifu };
 
 /* =====================================================================
    画面の描画・状態管理
@@ -502,7 +1030,7 @@ function renderSheet(){
     + '</div>'
     + '<div class="sec-ttl"><span class="no">れんしゅう①</span>ガイドつきで やってみよう</div>' + list(d.guided)
     + '<div class="sec-ttl"><span class="no">れんしゅう②</span>じりきで チャレンジ</div>' + list(d.plain)
-    + '<div class="foot-note">' + (state.settings.deco ? 'よく がんばりました 🌸　' : '') + 'まちがえたら、例題と ガイドを 見直して もう一度。 ― 算数つまずき診断＆補助プリント v1.1</div>';
+    + '<div class="foot-note">' + (state.settings.deco ? 'よく がんばりました 🌸　' : '') + 'まちがえたら、例題と ガイドを 見直して もう一度。 ― 算数・数学つまずき診断＆補助プリント v2.0</div>';
   fitSheet();
 }
 let compactFit = false;
