@@ -105,11 +105,17 @@ svg text{font-family:inherit;}
 #sheet.compact .ex-box{padding:7px 10px;}
 #sheet.compact .think{margin-top:5px;}
 @media print{
+  html, body{height:auto !important;}
   body{background:#fff;}
   header.top, .no-print{display:none !important;}
-  main{display:block; padding:0; max-width:none;}
-  .sheet-wrap{overflow:visible;}
-  #sheet{box-shadow:none; margin:0;}
+  main{display:block; padding:0; max-width:none; height:auto !important;}
+  .sheet-wrap{overflow:visible; height:auto !important;}
+  /* iOS Safariは @page の余白指定を無視し、印刷可能領域がA4実寸より小さい。
+     シートの最小高さ(296mm)が残ると、はみ出した空きが白紙の2ページ目になるため、
+     印刷時は最小高さを解除し、中身の高さだけで1枚に収める */
+  #sheet{box-shadow:none; margin:0; min-height:0 !important; height:auto !important;
+    padding:8mm 10mm 7mm;
+    break-inside:avoid; page-break-inside:avoid; page-break-after:avoid;}
   @page{size:A4 portrait; margin:0;}
 }
 </style>
@@ -500,7 +506,11 @@ let compactFit = false;
    （CSS zoomは印刷に効かないため、レイアウトそのものを変える方式にする） */
 function fitSheet(){
   const sheet = document.getElementById('sheet');
-  const targetPx = sheet.clientWidth * (297 / 210) * 0.982; /* 印刷時の丸め誤差ぶんの安全マージン */
+  /* iOS Safariの印刷は印刷可能領域がA4実寸より小さい（@page余白が効かない）ため、
+     中身の高さの上限をA4の約94%に抑える。あわせて、最小高さ(296mm)を外して
+     「中身だけの高さ」を測る（最小高さが残ると短いプリントまで縮小対象になる） */
+  const targetPx = sheet.clientWidth * (297 / 210) * 0.94;
+  sheet.style.minHeight = '0px';
   sheet.style.removeProperty('--pfs');
   sheet.querySelectorAll('.probs').forEach(p => p.classList.remove('cols3'));
   if(sheet.scrollHeight <= targetPx) return;
@@ -513,6 +523,7 @@ function fitSheet(){
     pfs = Math.max(7, pfs * (targetPx / sheet.scrollHeight));
     sheet.style.setProperty('--pfs', pfs + 'px');
   }
+  sheet.style.minHeight = ''; /* 画面表示ではA4らしい見た目（最小高さ）に戻す。印刷時はCSSで解除される */
 }
 
 /* --- 設定UI --- */
