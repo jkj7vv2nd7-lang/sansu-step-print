@@ -730,7 +730,7 @@ const a = [2, 3, 4, 5, -2, -3][rnd(0, 5)]; const b = rnd(-4, 6); const x0 = rnd(
 const y = x => a * x + b;
 const tbl = miniTableSVG([[V('x'), x0, x0 + 1, x0 + 2, x0 + 3], [V('y'), y(x0), y(x0 + 1), y(x0 + 2), y(x0 + 3)]]);
 const scaf = guided? '<div class="scaffold">' + V('x') + ' が 1 増えると ' + V('y') + ' は ' + a + ' 増えます。' + V('x') + ' が 3 増えると ' + V('y') + ' の増加量は その 3倍です</div>': '';
-return { q: V('y') + ' ＝ ' + a + V('x') + (b >= 0? ' ＋ ' + b: ' − ' + (-b)) + ' の表です。' + tbl
+return { q: V('y') + ' ＝ ' + a + V('x') + (b > 0? ' ＋ ' + b: b < 0? ' − ' + (-b): '') + ' の表です。' + tbl
 + V('x') + ' の増加量が 3 のとき、' + V('y') + ' の増加量は ' + B() + '、変化の割合は ' + B() + ' です' + scaf,
 a: V('y') + ' の増加量 <span class="ans">' + (3 * a) + '</span>、変化の割合 <span class="ans">' + a + '</span>', key: 'hk' + a + '/' + b + '/' + x0};
 }
