@@ -113,9 +113,13 @@ svg text{font-family:inherit;}
   /* iOS Safariは @page の余白指定を無視し、印刷可能領域がA4実寸より小さい。
      シートの最小高さ(296mm)が残ると、はみ出した空きが白紙の2ページ目になるため、
      印刷時は最小高さを解除し、中身の高さだけで1枚に収める */
+  body{margin:0 !important; padding:0 !important;}
+  .sheet-wrap{overflow:visible; height:auto !important; margin:0; padding:0;}
+  /* page-break-after:avoid を末尾の要素に付けると、WebKitでは白紙ページが
+     1枚追加されることがあるため付けない。はみ出し対策に overflow:hidden を併用 */
   #sheet{box-shadow:none; margin:0; min-height:0 !important; height:auto !important;
-    padding:8mm 10mm 7mm;
-    break-inside:avoid; page-break-inside:avoid; page-break-after:avoid;}
+    padding:8mm 10mm 7mm; overflow:hidden;
+    break-inside:avoid; page-break-inside:avoid;}
   @page{size:A4 portrait; margin:0;}
 }
 </style>
@@ -156,7 +160,7 @@ svg text{font-family:inherit;}
         <button class="btn sub" id="regenBtn">🎲 数字を変える</button>
         <button class="btn acc" id="ansBtn">✅ 解答を見る</button>
       </div>
-      <p class="small">A4縦・1枚に収まるよう自動調整します。解答プリントも同じボタンで切り替えて印刷できます。児童の名前などは保存しません（なまえ欄は印刷後に手書きしてください）。</p>
+      <p class="small">A4縦・1枚に収まるよう自動調整します。解答プリントも同じボタンで切り替えて印刷できます。児童の名前などは保存しません（なまえ欄は印刷後に手書きしてください）。（版：v1.1）</p>
     </section>
   </div>
   <div class="sheet-wrap">
@@ -498,7 +502,7 @@ function renderSheet(){
     + '</div>'
     + '<div class="sec-ttl"><span class="no">れんしゅう①</span>ガイドつきで やってみよう</div>' + list(d.guided)
     + '<div class="sec-ttl"><span class="no">れんしゅう②</span>じりきで チャレンジ</div>' + list(d.plain)
-    + '<div class="foot-note">' + (state.settings.deco ? 'よく がんばりました 🌸　' : '') + 'まちがえたら、例題と ガイドを 見直して もう一度。 ― 算数つまずき診断＆補助プリント</div>';
+    + '<div class="foot-note">' + (state.settings.deco ? 'よく がんばりました 🌸　' : '') + 'まちがえたら、例題と ガイドを 見直して もう一度。 ― 算数つまずき診断＆補助プリント v1.1</div>';
   fitSheet();
 }
 let compactFit = false;
